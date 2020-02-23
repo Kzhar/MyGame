@@ -1,0 +1,31 @@
+-mjwx
+-i obj/MyGame.ihx
+-b _CODE = 0x4000
+-b _DATA = 0x0000
+-u
+-k /home/diego/cpctelera/cpctelera/tools/sdcc-3.6.8-r9946/bin/../share/sdcc/lib/z80
+-k /home/diego/cpctelera/cpctelera/tools/sdcc-3.6.8-r9946/share/sdcc/lib/z80
+-l /home/diego/cpctelera/cpctelera/cpctelera.lib
+-l z80
+obj/assets/sprites/sword.rel
+obj/assets/sprites/RedBall.rel
+obj/assets/sprites/player01.rel
+obj/cpct_functions.h.rel
+obj/main.rel
+obj/assets/assets.h.rel
+obj/man/entity.h.rel
+obj/man/entity.rel
+obj/man/game.h.rel
+obj/man/game.rel
+obj/cmp/array_structure.h.rel
+obj/cmp/entity.h.rel
+obj/sys/ai_control.h.rel
+obj/sys/ai_control.rel
+obj/sys/input.h.rel
+obj/sys/input.rel
+obj/sys/physics.h.rel
+obj/sys/physics.rel
+obj/sys/render.h.rel
+obj/sys/render.rel
+
+-e

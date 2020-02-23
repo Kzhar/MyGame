@@ -1,0 +1,34 @@
+XL2
+H 9 areas 3 global symbols
+M player01
+O -mz80
+S .__.ABS. Def0000
+A _CODE size 50 flags 0 addr 0
+S _pal_main Def0000
+S _sp_mainchar Def0010
+A _DATA size 0 flags 0 addr 0
+A _INITIALIZED size 0 flags 0 addr 0
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size 0 flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _INITIALIZER size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00
+R 00 00 00 00
+T 00 00 54 44 55 5C 4C 56 57 5E 40 4E 47 52 53 4A
+R 00 00 00 00
+T 0E 00 43 4B
+R 00 00 00 00
+T 10 00
+R 00 00 00 00
+T 10 00 44 CC CC 88 44 C3 C3 00 CC C3 FF 00 C9 C3
+R 00 00 00 00
+T 1E 00 AE 82 C9 C3 C3 82 C9 C3 C3 82 C9 C3 C3 82
+R 00 00 00 00
+T 2C 00 44 C3 92 00 00 69 C3 00 00 3C 0C 00 00 2C
+R 00 00 00 00
+T 3A 00 3C 69 00 2C 0C 49 00 2C 0C 00 00 2C 0C 00
+R 00 00 00 00
+T 48 00 00 28 04 00 00 CC 44 88
+R 00 00 00 00
