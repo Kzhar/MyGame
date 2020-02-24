@@ -15,9 +15,13 @@ sys_ai_stand_by:
 			or a						;un or de algo consigo mismo da si mismo y cambia el flag
 			ret z
 
-			;PRESSED KEY, MOVER
-			ld e_vx(ix), #-1		;|PLACEHOLDER
-			ld e_vy(ix), #-1   	;|de momento solo cambiamos la velocidad de las entidades
+			;PRESSED KEY, MOVER PLACEHOLDER
+			ld a, e_x(iy)				;cargamos en a la posición del primer elemento del array de entidades, el player	
+			ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
+			ld a, e_y(iy)				;|
+			ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
+
+			ld e_ai_st(ix), #e_ai_st_move_to	;nuevo estado de la entidad, move_to
 ret
 
 sys_ai_move_to:
