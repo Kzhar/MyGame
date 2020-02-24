@@ -2592,68 +2592,68 @@ Hexadecimal [16-Bits]
                               6 
                      C000     7 screen_start = 0xC000
                               8 
-   422A                       9 sys_eren_init::
-   422A 0E 00         [ 7]   10 	ld c, #0
-   422C CD BF 43      [17]   11 	call cpct_setVideoMode_asm 	;pone el modo de video según el parámetro de c (0-3)
+   4270                       9 sys_eren_init::
+   4270 0E 00         [ 7]   10 	ld c, #0
+   4272 CD 05 44      [17]   11 	call cpct_setVideoMode_asm 	;pone el modo de video según el parámetro de c (0-3)
                              12 
-   422F 21 1C 40      [10]   13 	ld hl, #_pal_main
-   4232 11 10 00      [10]   14 	ld de, #16
-   4235 CD 82 42      [17]   15 	call cpct_setPalette_asm	;HL => colout array DE => number of colour to change
+   4275 21 1C 40      [10]   13 	ld hl, #_pal_main
+   4278 11 10 00      [10]   14 	ld de, #16
+   427B CD C8 42      [17]   15 	call cpct_setPalette_asm	;HL => colout array DE => number of colour to change
                              16 
    000E                      17 	cpctm_setBorder_asm HW_WHITE
                               1    .radix h
    000E                       2    cpctm_setBorder_raw_asm \HW_WHITE ;; [28] Macro that does the job, but requires a number value to be passed
                               1    .globl cpct_setPALColour_asm
-   4238 21 10 00      [10]    2    ld   hl, #0x010         ;; [3]  H=Hardware value of desired colour, L=Border INK (16)
-   423B CD 0B 43      [17]    3    call cpct_setPALColour_asm  ;; [25] Set Palette colour of the border
+   427E 21 10 00      [10]    2    ld   hl, #0x010         ;; [3]  H=Hardware value of desired colour, L=Border INK (16)
+   4281 CD 51 43      [17]    3    call cpct_setPALColour_asm  ;; [25] Set Palette colour of the border
                               3    .radix d
                              18 
-   423E C9            [10]   19 ret
+   4284 C9            [10]   19 ret
                              20 
-   423F                      21 sys_eren_update::
-   423F CD 43 42      [17]   22 	call sys_eren_render_entities
-   4242 C9            [10]   23 ret
+   4285                      21 sys_eren_update::
+   4285 CD 89 42      [17]   22 	call sys_eren_render_entities
+   4288 C9            [10]   23 ret
                              24 
-   4243                      25 sys_eren_render_entities::
-   4243 32 75 42      [13]   26 	ld (_ent_counter), a	;codigo automodificable
+   4289                      25 sys_eren_render_entities::
+   4289 32 BB 42      [13]   26 	ld (_ent_counter), a	;codigo automodificable
                              27 
-   4246                      28 	_update_loop:
+   428C                      28 	_update_loop:
                              29 
-   4246 DD 5E 0B      [19]   30 	ld e, e_lastVP_l(ix)	;
-   4249 DD 56 0C      [19]   31 	ld d, e_lastVP_h(ix)	;de posición antes del nuevo dibujado
-   424C AF            [ 4]   32 	xor a				;a = 0 fondo negro
-   424D DD 4E 04      [19]   33 	ld c, e_w(ix)
-   4250 DD 46 05      [19]   34 	ld b, e_h(ix)
-   4253 C5            [11]   35 	push bc			;lo usaremos luego para dibujar el sprite
-   4254 CD E4 43      [17]   36 	call cpct_drawSolidBox_asm	;de => video memory pointer, a => 1 byte colour pattern, c => width b => height
+   428C DD 5E 0B      [19]   30 	ld e, e_lastVP_l(ix)	;
+   428F DD 56 0C      [19]   31 	ld d, e_lastVP_h(ix)	;de posición antes del nuevo dibujado
+   4292 AF            [ 4]   32 	xor a				;a = 0 fondo negro
+   4293 DD 4E 04      [19]   33 	ld c, e_w(ix)
+   4296 DD 46 05      [19]   34 	ld b, e_h(ix)
+   4299 C5            [11]   35 	push bc			;lo usaremos luego para dibujar el sprite
+   429A CD 2A 44      [17]   36 	call cpct_drawSolidBox_asm	;de => video memory pointer, a => 1 byte colour pattern, c => width b => height
                              37 
                              38 
-   4257 11 00 C0      [10]   39 	ld de, #screen_start
-   425A DD 4E 00      [19]   40 	ld c, e_x(ix)
-   425D DD 46 01      [19]   41 	ld b, e_y(ix)
-   4260 CD 89 44      [17]   42 	call cpct_getScreenPtr_asm	;en HL => postition x y to video memory position
+   429D 11 00 C0      [10]   39 	ld de, #screen_start
+   42A0 DD 4E 00      [19]   40 	ld c, e_x(ix)
+   42A3 DD 46 01      [19]   41 	ld b, e_y(ix)
+   42A6 CD CF 44      [17]   42 	call cpct_getScreenPtr_asm	;en HL => postition x y to video memory position
                              43 
-   4263 DD 75 0B      [19]   44 	ld e_lastVP_l(ix), l		;
-   4266 DD 74 0C      [19]   45 	ld e_lastVP_h(ix), h		;guardamos la nueva posición de memoria de video en las variables de la entidad
+   42A9 DD 75 0B      [19]   44 	ld e_lastVP_l(ix), l		;
+   42AC DD 74 0C      [19]   45 	ld e_lastVP_h(ix), h		;guardamos la nueva posición de memoria de video en las variables de la entidad
                              46 
-   4269 EB            [ 4]   47 	ex de,hl				;DE posición, en memoria de video del puntero donde pintar el sprite
-   426A DD 6E 06      [19]   48 	ld l, e_pspr_l(ix)
-   426D DD 66 07      [19]   49 	ld h, e_pspr_h(ix)		;HL puntero al sprite
-   4270 C1            [10]   50 	pop bc				;BC tamaño del sptite
-   4271 CD 15 43      [17]   51 	call cpct_drawSprite_asm
+   42AF EB            [ 4]   47 	ex de,hl				;DE posición, en memoria de video del puntero donde pintar el sprite
+   42B0 DD 6E 06      [19]   48 	ld l, e_pspr_l(ix)
+   42B3 DD 66 07      [19]   49 	ld h, e_pspr_h(ix)		;HL puntero al sprite
+   42B6 C1            [10]   50 	pop bc				;BC tamaño del sptite
+   42B7 CD 5B 43      [17]   51 	call cpct_drawSprite_asm
                              52 
                      004B    53 	_ent_counter =.+1 		;constante que marca la posicíón de memoria a modificar para modificar el código
-   4274 3E 00         [ 7]   54 	ld a, #0				;en este caso cargaremos en a el número de entidades que quedan por renderizar
+   42BA 3E 00         [ 7]   54 	ld a, #0				;en este caso cargaremos en a el número de entidades que quedan por renderizar
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 54.
 Hexadecimal [16-Bits]
 
 
 
-   4276 3D            [ 4]   55 	dec a
-   4277 C8            [11]   56 	ret z					;si no queda ninguna por renderizar se sale del bucle
+   42BC 3D            [ 4]   55 	dec a
+   42BD C8            [11]   56 	ret z					;si no queda ninguna por renderizar se sale del bucle
                              57 
-   4278 32 75 42      [13]   58 	ld (_ent_counter), a		;si no ahora la posición de ld ? (_ent counter) vale uno menos
+   42BE 32 BB 42      [13]   58 	ld (_ent_counter), a		;si no ahora la posición de ld ? (_ent counter) vale uno menos
                              59 
-   427B 01 0D 00      [10]   60 	ld bc, #sizeof_e
-   427E DD 09         [15]   61 	add ix, bc				;ix apunta a la siguente entidad y A => entidades pendientes de renderizar
-   4280 18 C4         [12]   62 	jr _update_loop			;volvemos al loop
+   42C1 01 0D 00      [10]   60 	ld bc, #sizeof_e
+   42C4 DD 09         [15]   61 	add ix, bc				;ix apunta a la siguente entidad y A => entidades pendientes de renderizar
+   42C6 18 C4         [12]   62 	jr _update_loop			;volvemos al loop

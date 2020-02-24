@@ -121,9 +121,9 @@ Hexadecimal [16-Bits]
    0008 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    000A 00                    6 	.db e_ai_st_noAI		
    000B CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   000D                      14 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFF, 2, 8, _sp_redball, e_ai_st_stand_by
+   000D                      14 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
    000D 46 28                 1 	.db 70, 40		;posición
-   000F FF FF                 2 	.db 0xFF, 0xFF	;velocidad
+   000F FF FE                 2 	.db 0xFF, 0xFE	;velocidad
    0011 02 08                 3 	.db 2, 8		;tamaño
    0013 00 00                 4 	.dw _sp_redball		;puntero a sprite
    0015 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse

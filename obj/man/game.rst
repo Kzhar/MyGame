@@ -121,9 +121,9 @@ Hexadecimal [16-Bits]
    40F9 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    40FB 00                    6 	.db e_ai_st_noAI		
    40FC CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   000D                      14 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFF, 2, 8, _sp_redball, e_ai_st_stand_by
+   000D                      14 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
    40FE 46 28                 1 	.db 70, 40		;posición
-   4100 FF FF                 2 	.db 0xFF, 0xFF	;velocidad
+   4100 FF FE                 2 	.db 0xFF, 0xFE	;velocidad
    4102 02 08                 3 	.db 2, 8		;tamaño
    4104 0C 40                 4 	.dw _sp_redball		;puntero a sprite
    4106 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
@@ -142,9 +142,9 @@ Hexadecimal [16-Bits]
                              18 
    411B CD C1 40      [17]   19 	call man_entity_getArray	;|	
    411E CD 57 41      [17]   20 	call sys_ai_control_init	;|utilizamos getArray porque utilizamos el init para meter el puntero al array en ix en el update mediante CODAUTMOD
-   4121 CD 2A 42      [17]   21 	call sys_eren_init
-   4124 CD 9A 41      [17]   22 	call sys_input_init
-   4127 CD E7 41      [17]   23 	call sys_physics_init
+   4121 CD 70 42      [17]   21 	call sys_eren_init
+   4124 CD E0 41      [17]   22 	call sys_input_init
+   4127 CD 2D 42      [17]   23 	call sys_physics_init
                              24 
                              25 
    412A 21 F1 40      [10]   26 	ld hl, #player
@@ -157,11 +157,11 @@ Hexadecimal [16-Bits]
                              33 
    413D                      34 man_game_update::
    413D CD C1 40      [17]   35 	call man_entity_getArray
-   4140 CD 9B 41      [17]   36 	call sys_input_update
+   4140 CD E1 41      [17]   36 	call sys_input_update
    4143 CD C1 40      [17]   37 	call man_entity_getArray	;¡¡¡¡de momento hay que pasar esto, puntero a entidades en ix ya no hace falta pasarlo, pero hasta próxima modificación si que hay que pasar número de entidades en a
-   4146 CD 73 41      [17]   38 	call sys_ai_control_update
+   4146 CD B9 41      [17]   38 	call sys_ai_control_update
    4149 CD C1 40      [17]   39 	call man_entity_getArray
-   414C CD E8 41      [17]   40 	call sys_pysics_update
+   414C CD 2E 42      [17]   40 	call sys_pysics_update
    414F C9            [10]   41 ret
                              42 
    4150                      43 man_game_render::
@@ -171,6 +171,6 @@ Hexadecimal [16-Bits]
 
 
 
-   4153 CD 3F 42      [17]   45 	call sys_eren_update
+   4153 CD 85 42      [17]   45 	call sys_eren_update
    4156 C9            [10]   46 ret
                              47 

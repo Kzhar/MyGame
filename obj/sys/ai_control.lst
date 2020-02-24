@@ -55,7 +55,7 @@ Hexadecimal [16-Bits]
                               4 
    0000                       5 sys_ai_control_init::
    0000 DD 22 0B 00   [20]    6 	ld (_ent_array_prt_tmp_standby), IX
-   0004 DD 22 21 00   [20]    7 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
+   0004 DD 22 67 00   [20]    7 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
    0008 C9            [10]    8 ret
                               9 
                              10 ;RUTINAS INTERNAS
@@ -66,41 +66,91 @@ Hexadecimal [16-Bits]
    0010 B7            [ 4]   15 			or a						;un or de algo consigo mismo da si mismo y cambia el flag
    0011 C8            [11]   16 			ret z
                              17 
-                             18 			;PRESSED KEY, MOVER
-   0012 DD 36 02 FF   [19]   19 			ld e_vx(ix), #-1		;|PLACEHOLDER
-   0016 DD 36 03 FF   [19]   20 			ld e_vy(ix), #-1   	;|de momento solo cambiamos la velocidad de las entidades
-   001A C9            [10]   21 ret
-                             22 
-   001B                      23 sys_ai_move_to:
-                             24 
-   001B C9            [10]   25 ret
+                             18 			;PRESSED KEY, MOVER PLACEHOLDER
+   0012 FD 7E 00      [19]   19 			ld a, e_x(iy)				;cargamos en a la posición del primer elemento del array de entidades, el player	
+   0015 DD 77 08      [19]   20 			ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
+   0018 FD 7E 01      [19]   21 			ld a, e_y(iy)				;|
+   001B DD 77 09      [19]   22 			ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
+                             23 
+   001E DD 36 0A 02   [19]   24 			ld e_ai_st(ix), #e_ai_st_move_to	;nuevo estado de la entidad, move_to
+   0022 C9            [10]   25 ret
                              26 
-   001C                      27 sys_ai_control_update::
-   001C 32 35 00      [13]   28 	ld(_ent_counter), a		;cargamos en el punto de la constante del contador de entidades por las que hay que ir iterando
-                     0021    29 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
-   001F DD 21 00 00   [14]   30 	ld ix, #0x0000
-                             31 
-   0023                      32 	_loop:
-   0023 DD 7E 0A      [19]   33 		ld a, e_ai_st(ix)		;status de ia
-   0026 FE 00         [ 7]   34 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
-   0028 28 0A         [12]   35 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
+   0023                      27 sys_ai_move_to:
+                             28 ;COMPROBAR X ********************
+   0023 DD 7E 08      [19]   29 	ld a, e_ai_aim_X(ix)			;a = objX
+   0026 DD 96 00      [19]   30 	sub e_x(ix)					;a = objX - x
+   0029 30 06         [12]   31 	jr nc, _objx_greater_or_equal		;objX - x > 0 (objX > x)
+                             32 
+   002B                      33 	_objx_lesser:
+   002B DD 36 02 FF   [19]   34 		ld e_vx(ix), #-1			;move to the left
+   002F 18 0C         [12]   35 		jr _endif_x
                              36 
-   002A                      37 		_AIent:
-   002A FE 01         [ 7]   38 			cp #e_ai_st_stand_by	;comparamos la variable e_ai_st(status) con la constante de standby
-   002C CC 09 00      [17]   39 			call z, sys_ai_stand_by	;vamos a la rutina de standby
-   002F FE 02         [ 7]   40 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
-   0031 CC 1B 00      [17]   41 			call z, sys_ai_move_to
-                             42 
-   0034                      43 		_no_AI_ent:
-                     0035    44 		_ent_counter=.+1
-   0034 3E 00         [ 7]   45 			ld a, #0		;|
-   0036 3D            [ 4]   46 			dec a			;|
-   0037 C8            [11]   47 			ret z			;|si ya se ha pasado por todas las unidades se sale de la rurina	
-                             48 
-   0038 32 35 00      [13]   49 			ld (_ent_counter), a	;|
-   003B 11 0D 00      [10]   50 			ld de, #sizeof_e		;|
-   003E DD 19         [15]   51 			add ix, de			;|se pasa a la siguiente entidad
-                             52 
-   0040 18 E1         [12]   53 			jr _loop
+   0031                      37 	_objx_greater_or_equal:
+   0031 28 06         [12]   38 		jr z, _arrived_x			;si es cero ya ha llegado al objetivo
+   0033 DD 36 02 01   [19]   39 		ld e_vx(ix), #1			;move to the right
+   0037 18 04         [12]   40 		jr _endif_x
+                             41 
+   0039                      42 	_arrived_x:
+   0039 DD 36 02 00   [19]   43 		ld e_vx(ix), #0			;x velociti = 0
+                             44 
+   003D                      45 	_endif_x:
+                             46 ;COMPROBAR Y *********************
+   003D DD 7E 09      [19]   47 	ld a, e_ai_aim_y(ix)			;a = objX
+   0040 DD 96 01      [19]   48 	sub e_y(ix)					;a = objX - x
+   0043 30 06         [12]   49 	jr nc, _objy_greater_or_equal		;objX - x > 0 (objX > x)
+                             50 
+   0045                      51 	_objy_lesser:
+   0045 DD 36 03 FE   [19]   52 		ld e_vy(ix), #-2			
+   0049 18 16         [12]   53 		jr _endif_y
                              54 
-   0042 C9            [10]   55 ret
+   004B                      55 	_objy_greater_or_equal:
+   004B 28 06         [12]   56 		jr z, _arrived_y			;si es cero ya ha llegado al objetivo
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
+Hexadecimal [16-Bits]
+
+
+
+   004D DD 36 03 02   [19]   57 		ld e_vy(ix), #2			
+   0051 18 0E         [12]   58 		jr _endif_y
+                             59 
+   0053                      60 	_arrived_y:
+   0053 DD 36 03 00   [19]   61 		ld e_vy(ix), #0			;x velociti = 0
+                             62 
+   0057 DD 7E 02      [19]   63 		ld a, e_vx(ix)			;velociad de x
+   005A B7            [ 4]   64 		or a					;comparar con cero
+   005B 20 04         [12]   65 		jr nz, _endif_y			;si no es cero seguimos con el bucle
+   005D DD 36 0A 01   [19]   66 			ld e_ai_st(ix), #e_ai_st_stand_by ;si es cero (las dos son cero), cambiamos el status de la entidad a stand by
+                             67 
+   0061                      68 	_endif_y:
+                             69 
+   0061 C9            [10]   70 ret
+                             71 
+   0062                      72 sys_ai_control_update::
+   0062 32 7B 00      [13]   73 	ld(_ent_counter), a		;cargamos en el punto de la constante del contador de entidades por las que hay que ir iterando
+                     0067    74 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+   0065 DD 21 00 00   [14]   75 	ld ix, #0x0000
+                             76 
+   0069                      77 	_loop:
+   0069 DD 7E 0A      [19]   78 		ld a, e_ai_st(ix)		;status de ia
+   006C FE 00         [ 7]   79 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
+   006E 28 0A         [12]   80 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
+                             81 
+   0070                      82 		_AIent:
+   0070 FE 01         [ 7]   83 			cp #e_ai_st_stand_by	;comparamos la variable e_ai_st(status) con la constante de standby
+   0072 CC 09 00      [17]   84 			call z, sys_ai_stand_by	;vamos a la rutina de standby
+   0075 FE 02         [ 7]   85 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
+   0077 CC 23 00      [17]   86 			call z, sys_ai_move_to
+                             87 
+   007A                      88 		_no_AI_ent:
+                     007B    89 		_ent_counter=.+1
+   007A 3E 00         [ 7]   90 			ld a, #0		;|
+   007C 3D            [ 4]   91 			dec a			;|
+   007D C8            [11]   92 			ret z			;|si ya se ha pasado por todas las unidades se sale de la rurina	
+                             93 
+   007E 32 7B 00      [13]   94 			ld (_ent_counter), a	;|
+   0081 11 0D 00      [10]   95 			ld de, #sizeof_e		;|
+   0084 DD 19         [15]   96 			add ix, de			;|se pasa a la siguiente entidad
+                             97 
+   0086 18 E1         [12]   98 			jr _loop
+                             99 
+   0088 C9            [10]  100 ret

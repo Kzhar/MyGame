@@ -25,6 +25,47 @@ sys_ai_stand_by:
 ret
 
 sys_ai_move_to:
+;COMPROBAR X ********************
+	ld a, e_ai_aim_X(ix)			;a = objX
+	sub e_x(ix)					;a = objX - x
+	jr nc, _objx_greater_or_equal		;objX - x > 0 (objX > x)
+
+	_objx_lesser:
+		ld e_vx(ix), #-1			;move to the left
+		jr _endif_x
+
+	_objx_greater_or_equal:
+		jr z, _arrived_x			;si es cero ya ha llegado al objetivo
+		ld e_vx(ix), #1			;move to the right
+		jr _endif_x
+
+	_arrived_x:
+		ld e_vx(ix), #0			;x velociti = 0
+
+	_endif_x:
+;COMPROBAR Y *********************
+	ld a, e_ai_aim_y(ix)			;a = objX
+	sub e_y(ix)					;a = objX - x
+	jr nc, _objy_greater_or_equal		;objX - x > 0 (objX > x)
+
+	_objy_lesser:
+		ld e_vy(ix), #-2			
+		jr _endif_y
+
+	_objy_greater_or_equal:
+		jr z, _arrived_y			;si es cero ya ha llegado al objetivo
+		ld e_vy(ix), #2			
+		jr _endif_y
+
+	_arrived_y:
+		ld e_vy(ix), #0			;x velociti = 0
+
+		ld a, e_vx(ix)			;velociad de x
+		or a					;comparar con cero
+		jr nz, _endif_y			;si no es cero seguimos con el bucle
+			ld e_ai_st(ix), #e_ai_st_stand_by ;si es cero (las dos son cero), cambiamos el status de la entidad a stand by
+
+	_endif_y:
 
 ret
 

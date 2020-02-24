@@ -84,65 +84,65 @@ Hexadecimal [16-Bits]
                      0050     4 screen_width = 80
                      00C8     5 screen_height = 200
                               6 
-   41E7                       7 sys_physics_init::
-   41E7 C9            [10]    8 ret
+   422D                       7 sys_physics_init::
+   422D C9            [10]    8 ret
                               9 
                              10 ;INPUT: 	IX POINTER TO ENTITY ARRAY
                              11 ;		A NUMBER OF ELEMENTS IN THE ARRAY
-   41E8                      12 sys_pysics_update::
-   41E8 47            [ 4]   13 	ld b, a	;b number of entities in the array
+   422E                      12 sys_pysics_update::
+   422E 47            [ 4]   13 	ld b, a	;b number of entities in the array
                              14 
-   41E9                      15 _update_loop:
-   41E9 3E 51         [ 7]   16 	ld a, #screen_width + 1
-   41EB DD 96 04      [19]   17 	sub e_w(ix)
-   41EE 4F            [ 4]   18 	ld c, a			;C = posición máxima de la entidad + 1
+   422F                      15 _update_loop:
+   422F 3E 51         [ 7]   16 	ld a, #screen_width + 1
+   4231 DD 96 04      [19]   17 	sub e_w(ix)
+   4234 4F            [ 4]   18 	ld c, a			;C = posición máxima de la entidad + 1
                              19 
-   41EF DD 7E 00      [19]   20 	ld a, e_x(ix)		;A = Posición actual
-   41F2 DD 86 02      [19]   21 	add e_vx(ix)		;A = Posición actual + velocidad
-   41F5 B9            [ 4]   22 	cp c				;comparar con la posición maxima mas uno (si es la máxima daría cero)
-   41F6 30 05         [12]   23 	jr nc, invalid_x
+   4235 DD 7E 00      [19]   20 	ld a, e_x(ix)		;A = Posición actual
+   4238 DD 86 02      [19]   21 	add e_vx(ix)		;A = Posición actual + velocidad
+   423B B9            [ 4]   22 	cp c				;comparar con la posición maxima mas uno (si es la máxima daría cero)
+   423C 30 05         [12]   23 	jr nc, invalid_x
                              24 
-   41F8                      25 	valid_x:
-   41F8 DD 77 00      [19]   26 		ld e_x(ix), a	;cargar en e_x la nueva posición
-   41FB 18 08         [12]   27 		jr endif_x
+   423E                      25 	valid_x:
+   423E DD 77 00      [19]   26 		ld e_x(ix), a	;cargar en e_x la nueva posición
+   4241 18 08         [12]   27 		jr endif_x
                              28 
-   41FD                      29 	invalid_x:
-   41FD DD 7E 02      [19]   30 		ld a, e_vx(ix)
-   4200 ED 44         [ 8]   31 		neg
-   4202 DD 77 02      [19]   32 		ld e_vx(ix), a		;se invierte la velocidad en x
+   4243                      29 	invalid_x:
+   4243 DD 7E 02      [19]   30 		ld a, e_vx(ix)
+   4246 ED 44         [ 8]   31 		neg
+   4248 DD 77 02      [19]   32 		ld e_vx(ix), a		;se invierte la velocidad en x
                              33 
-   4205                      34 	endif_x:
+   424B                      34 	endif_x:
                              35 
-   4205 3E C9         [ 7]   36 	ld a, #screen_height + 1
-   4207 DD 96 05      [19]   37 	sub e_h(ix)
-   420A 4F            [ 4]   38 	ld c, a				;C = posición máxima de la entidad + 1
+   424B 3E C9         [ 7]   36 	ld a, #screen_height + 1
+   424D DD 96 05      [19]   37 	sub e_h(ix)
+   4250 4F            [ 4]   38 	ld c, a				;C = posición máxima de la entidad + 1
                              39 
-   420B DD 7E 01      [19]   40 	ld a, e_y(ix)
-   420E DD 86 03      [19]   41 	add e_vy(ix)
-   4211 B9            [ 4]   42 	cp c					;comparar con la posición máxima + 1 
-   4212 30 05         [12]   43 	jr nc, invalid_y
+   4251 DD 7E 01      [19]   40 	ld a, e_y(ix)
+   4254 DD 86 03      [19]   41 	add e_vy(ix)
+   4257 B9            [ 4]   42 	cp c					;comparar con la posición máxima + 1 
+   4258 30 05         [12]   43 	jr nc, invalid_y
                              44 
-   4214                      45 	valid_y:
-   4214 DD 77 01      [19]   46 		ld e_y(ix), a	;cargar en e_y la nueva posición
-   4217 18 08         [12]   47 		jr endif_y
+   425A                      45 	valid_y:
+   425A DD 77 01      [19]   46 		ld e_y(ix), a	;cargar en e_y la nueva posición
+   425D 18 08         [12]   47 		jr endif_y
                              48 
-   4219                      49 	invalid_y:
-   4219 DD 7E 03      [19]   50 		ld a, e_vy(ix)
-   421C ED 44         [ 8]   51 		neg
-   421E DD 77 03      [19]   52 		ld e_vy(ix), a	;se invierte la velocidad en y
+   425F                      49 	invalid_y:
+   425F DD 7E 03      [19]   50 		ld a, e_vy(ix)
+   4262 ED 44         [ 8]   51 		neg
+   4264 DD 77 03      [19]   52 		ld e_vy(ix), a	;se invierte la velocidad en y
                              53 
-   4221                      54 	endif_y:
+   4267                      54 	endif_y:
                              55 
-   4221 05            [ 4]   56 	dec b		;numero de entidades en el array
+   4267 05            [ 4]   56 	dec b		;numero de entidades en el array
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 5.
 Hexadecimal [16-Bits]
 
 
 
-   4222 C8            [11]   57 	ret z
+   4268 C8            [11]   57 	ret z
                              58 
-   4223 11 0D 00      [10]   59 	ld de, #sizeof_e
-   4226 DD 19         [15]   60 	add ix, de			;ix apunta a la siguiente entidad
-   4228 18 BF         [12]   61 	jr _update_loop
+   4269 11 0D 00      [10]   59 	ld de, #sizeof_e
+   426C DD 19         [15]   60 	add ix, de			;ix apunta a la siguiente entidad
+   426E 18 BF         [12]   61 	jr _update_loop
                              62 
                              63 

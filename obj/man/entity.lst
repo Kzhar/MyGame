@@ -2600,8 +2600,7 @@ Hexadecimal [16-Bits]
                              12 ;la macro DefineCmp_Entity_default se encuentra en el fichero cmp/entity.h.s donde se encuentran las macros de creación de entidades vacías
                              13 ;la macro DefineComponentArrayStructure se encuentra en el fichero cmp/array_structure.h.s y crea toda la estructura de entidades vacías
                              14 
-                             15 
-   0000                      16 DefineComponentArrayStructure  _entity, max_entities, DefineCmp_Entity_default
+   0000                      15 DefineComponentArrayStructure  _entity, max_entities, DefineCmp_Entity_default
    0000 00                    1 	_entity_num: .db 0
    0001 03 00                 2 	_entity_pend: .dw _entity_array
    0003                       3 	_entity_array:
@@ -2646,74 +2645,74 @@ Hexadecimal [16-Bits]
    0035 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
    0037                       1 		DefineCmp_Entity_default
    0037                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+   0037 00 00                 1 	.db 0, 0		;posición
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 54.
 Hexadecimal [16-Bits]
 
 
 
-   0037 00 00                 1 	.db 0, 0		;posición
    0039 00 00                 2 	.db 0, 0	;velocidad
    003B 01 01                 3 	.db 1, 1		;tamaño
    003D 00 00                 4 	.dw 0x0000		;puntero a sprite
    003F 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    0041 00                    6 	.db e_ai_st_noAI		
    0042 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-                             17 
-                             18 ;Para trabajar con entidades se necesita poner el puntero ix en el comienzo del array de entidades
-                             19 ;RETURN a número de entidades
-   0044                      20 man_entity_getArray::
-   0044 DD 21 03 00   [14]   21 	ld ix, #_entity_array
-   0048 3A 00 00      [13]   22 	ld a, (_entity_num)
-   004B C9            [10]   23 ret
-                             24 
-                             25 ;se resetea el número de entidades a cero y se situa al principio del array el puntero _entity_pend
-                             26 ;puntero que señala al byte donde se debe crear la nueva entidad (en este caso al principio) 
-   004C                      27 man_entity_init::
-   004C AF            [ 4]   28 	xor a				;a=0
-   004D 32 00 00      [13]   29 	ld (_entity_num), a	;iniciamos el número de unidades creadas a cero
-                             30 
-   0050 21 03 00      [10]   31 	ld hl, #_entity_array	;hl apunta a la primera posición del array de entidades
-   0053 22 01 00      [16]   32 	ld (_entity_pend), hl	;posición donde se creará la siguiente entidad => primera posición del array
-                             33 
-   0056 C9            [10]   34 ret
+                             16 
+                             17 ;Para trabajar con entidades se necesita poner el puntero ix en el comienzo del array de entidades
+                             18 ;RETURN a número de entidades
+   0044                      19 man_entity_getArray::
+   0044 DD 21 03 00   [14]   20 	ld ix, #_entity_array
+   0048 3A 00 00      [13]   21 	ld a, (_entity_num)
+   004B C9            [10]   22 ret
+                             23 
+                             24 ;se resetea el número de entidades a cero y se situa al principio del array el puntero _entity_pend
+                             25 ;puntero que señala al byte donde se debe crear la nueva entidad (en este caso al principio) 
+   004C                      26 man_entity_init::
+   004C AF            [ 4]   27 	xor a				;a=0
+   004D 32 00 00      [13]   28 	ld (_entity_num), a	;iniciamos el número de unidades creadas a cero
+                             29 
+   0050 21 03 00      [10]   30 	ld hl, #_entity_array	;hl apunta a la primera posición del array de entidades
+   0053 22 01 00      [16]   31 	ld (_entity_pend), hl	;posición donde se creará la siguiente entidad => primera posición del array
+                             32 
+   0056 C9            [10]   33 ret
+                             34 
                              35 
-                             36 
-                             37 ;INPUT HL => PUNTERO A VALORES DE INICIALIZACIÓN DE LA ENTIDAD A CREAR
-                             38 ;RETURN ix => PUNTERO A LA ENTIDAD CREADA
-   0057                      39 man_entity_create::
-   0057 E5            [11]   40 	push hl			;man_entity_new destruye hl
-   0058 CD 63 00      [17]   41 	call man_entity_new
-                             42 
-   005B                      43 	ld__ixh_d
+                             36 ;INPUT HL => PUNTERO A VALORES DE INICIALIZACIÓN DE LA ENTIDAD A CREAR
+                             37 ;RETURN ix => PUNTERO A LA ENTIDAD CREADA
+   0057                      38 man_entity_create::
+   0057 E5            [11]   39 	push hl			;man_entity_new destruye hl
+   0058 CD 63 00      [17]   40 	call man_entity_new
+                             41 
+   005B                      42 	ld__ixh_d
    005B DD 62                 1    .dw #0x62DD  ;; Opcode for ld ixh, d
-   005D                      44 	ld__ixl_e	;instrucciones no comentadas de CPC (macro de cpctelera) ix = de puntero a la entidad añadida
+   005D                      43 	ld__ixl_e	;instrucciones no comentadas de CPC (macro de cpctelera) ix = de puntero a la entidad añadida
    005D DD 6B                 1    .dw #0x6BDD  ;; Opcode for ld ixl, e
-                             45 
-   005F E1            [10]   46 	pop hl
-   0060 ED B0         [21]   47 	ldir		;copia array hl en array de (tamaño del array bc)
-                             48 
-   0062 C9            [10]   49 ret
-                             50 
-                             51 ;se añade uno al contador de unidades y se mueve _entity_pend a la posición para crear la siguiente entidad
-                             52 ;Devueleve los siguientes valores para el ldir
-                             53 ;RETURN  	DE= PUNTERO AL NUEVO ELEMENTO A AÑADIR (AÑADIDO PERO SIN DATOS?)
-                             54 ;		BC= TAMAÑO DE LA ENTIDAD PARA HACER EL LDIR sizeof_e		
-   0063                      55 man_entity_new::
-   0063 21 00 00      [10]   56 	ld hl, #_entity_num
-   0066 34            [11]   57 	inc (hl)			;+1 ENTIDAD NUEVA CREADA
-                             58 
-   0067 2A 01 00      [16]   59 	ld hl,(_entity_pend)	;PUNTERO A LA DIRECCIÓN DE MEMORIA DONDE SE CREARÁ LA UNIDAD
-                             60 
-   006A 54            [ 4]   61 	ld d, h
-   006B 5D            [ 4]   62 	ld e, l
+                             44 
+   005F E1            [10]   45 	pop hl
+   0060 ED B0         [21]   46 	ldir		;copia array hl en array de (tamaño del array bc)
+                             47 
+   0062 C9            [10]   48 ret
+                             49 
+                             50 ;se añade uno al contador de unidades y se mueve _entity_pend a la posición para crear la siguiente entidad
+                             51 ;Devueleve los siguientes valores para el ldir
+                             52 ;RETURN  	DE= PUNTERO AL NUEVO ELEMENTO A AÑADIR (AÑADIDO PERO SIN DATOS?)
+                             53 ;		BC= TAMAÑO DE LA ENTIDAD PARA HACER EL LDIR sizeof_e		
+   0063                      54 man_entity_new::
+   0063 21 00 00      [10]   55 	ld hl, #_entity_num
+   0066 34            [11]   56 	inc (hl)			;+1 ENTIDAD NUEVA CREADA
+                             57 
+   0067 2A 01 00      [16]   58 	ld hl,(_entity_pend)	;PUNTERO A LA DIRECCIÓN DE MEMORIA DONDE SE CREARÁ LA UNIDAD
+                             59 
+   006A 54            [ 4]   60 	ld d, h
+   006B 5D            [ 4]   61 	ld e, l
+   006C 01 0D 00      [10]   62 	ld bc, #sizeof_e
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 55.
 Hexadecimal [16-Bits]
 
 
 
-   006C 01 0D 00      [10]   63 	ld bc, #sizeof_e
-   006F 09            [11]   64 	add hl, bc
-   0070 22 01 00      [16]   65 	ld (_entity_pend), hl	;AHORA EL PUNTERO PARA LA CREAR LA SIGUIENTE UNIDAD SE MUEVE EL TAMAÑO DE UNA ENTIDAD EN EL ARRAY
+   006F 09            [11]   63 	add hl, bc
+   0070 22 01 00      [16]   64 	ld (_entity_pend), hl	;AHORA EL PUNTERO PARA LA CREAR LA SIGUIENTE UNIDAD SE MUEVE EL TAMAÑO DE UNA ENTIDAD EN EL ARRAY
+                             65 
                              66 
-                             67 
-   0073 C9            [10]   68 ret
+   0073 C9            [10]   67 ret

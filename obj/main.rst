@@ -2547,11 +2547,11 @@ Hexadecimal [16-Bits]
                              11 
    406C                      12 _main::
                              13 ;; Disable firmware to prevent it from interfering with string drawing	 
-   406C CD D4 43      [17]   14 call cpct_disableFirmware_asm
+   406C CD 1A 44      [17]   14 call cpct_disableFirmware_asm
    406F CD 18 41      [17]   15 call man_game_init
                              16 
    4072                      17 loop:
    4072 CD 3D 41      [17]   18 	call man_game_update
-   4075 CD CC 43      [17]   19 	call cpct_waitVSYNC_asm
+   4075 CD 12 44      [17]   19 	call cpct_waitVSYNC_asm
    4078 CD 50 41      [17]   20 	call man_game_render
    407B 18 F5         [12]   21    jr    loop

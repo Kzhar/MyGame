@@ -12,7 +12,6 @@ max_entities == #05 ;numero máximo de entidades que se pueden crear
 ;la macro DefineCmp_Entity_default se encuentra en el fichero cmp/entity.h.s donde se encuentran las macros de creación de entidades vacías
 ;la macro DefineComponentArrayStructure se encuentra en el fichero cmp/array_structure.h.s y crea toda la estructura de entidades vacías
 
-
 DefineComponentArrayStructure  _entity, max_entities, DefineCmp_Entity_default
 
 ;Para trabajar con entidades se necesita poner el puntero ix en el comienzo del array de entidades

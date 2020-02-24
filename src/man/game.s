@@ -11,7 +11,7 @@
 
 ;Definimos una estructura con datos para player
 player: 	DefineCmp_Entity 0, 0, 1, 2, 4, 16, _sp_mainchar, e_ai_st_noAI
-redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFF, 2, 8, _sp_redball, e_ai_st_stand_by
+redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
 sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
 man_game_init::
 	call man_entity_init	;resetea el número de entidades a cero
