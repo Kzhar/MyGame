@@ -67,4 +67,5 @@ Hexadecimal [16-Bits]
                              16 	.rept _N
                              17 		_DefineTypeMacroDefault
                              18 	.endm
-                             19 .endm
+                             19 	.db #0xDE, #0xAD, #0x00, #0x00, #0x00			;se crean tres nuevos bytes al final del array de forma provisional 
+                             20 .endm

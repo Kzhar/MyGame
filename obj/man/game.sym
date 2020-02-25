@@ -12,7 +12,7 @@ Symbol Table
     e_pspr_l=  0006     |     e_vx    =  0002     |     e_vy    =  0003 
     e_w     =  0004     |     e_x     =  0000     |     e_y     =  0001 
     man_enti   **** GX  |     man_enti   **** GX  |     man_enti   **** GX
-    man_enti   **** GX  |   0 man_game   0027 GR  |   0 man_game   005F GR
+    man_enti   **** GX  |   0 man_game   0027 GR  |   0 man_game   0056 GR
   0 man_game   004C GR  |   0 player     0000 R   |   0 redball    000D R
     sizeof_e=  000D     |   0 sword      001A R   |     sys_ai_c   **** GX
     sys_ai_c   **** GX  |     sys_eren   **** GX  |     sys_eren   **** GX
@@ -24,5 +24,5 @@ Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   66   flags    0
+   0 _CODE      size   5A   flags    0
 

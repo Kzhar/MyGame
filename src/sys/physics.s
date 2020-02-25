@@ -5,14 +5,22 @@ screen_width = 80
 screen_height = 200
 
 sys_physics_init::
+	ld (_ent_array_ptr), ix
 ret
 
 ;INPUT: 	IX POINTER TO ENTITY ARRAY
 ;		A NUMBER OF ELEMENTS IN THE ARRAY
 sys_pysics_update::
-	ld b, a	;b number of entities in the array
+	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+	ld ix, #0x0000			;
+	;ld b, a	;b number of entities in the array
 
 _update_loop:
+
+	ld a, e_w(ix)
+	or a
+	ret z
+
 	ld a, #screen_width + 1
 	sub e_w(ix)
 	ld c, a			;C = posición máxima de la entidad + 1
@@ -53,8 +61,8 @@ _update_loop:
 
 	endif_y:
 
-	dec b		;numero de entidades en el array
-	ret z
+	;dec b		;numero de entidades en el array
+	;ret z
 
 	ld de, #sizeof_e
 	add ix, de			;ix apunta a la siguiente entidad

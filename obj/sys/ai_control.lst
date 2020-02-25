@@ -54,8 +54,8 @@ Hexadecimal [16-Bits]
                               3 .module sys_ai_control
                               4 
    0000                       5 sys_ai_control_init::
-   0000 DD 22 0B 00   [20]    6 	ld (_ent_array_prt_tmp_standby), IX
-   0004 DD 22 67 00   [20]    7 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
+   0000 DD 22 0B 00   [20]    6 	ld (_ent_array_prt_tmp_standby), ix
+   0004 DD 22 64 00   [20]    7 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
    0008 C9            [10]    8 ret
                               9 
                              10 ;RUTINAS INTERNAS
@@ -126,31 +126,29 @@ Hexadecimal [16-Bits]
    0061 C9            [10]   70 ret
                              71 
    0062                      72 sys_ai_control_update::
-   0062 32 7B 00      [13]   73 	ld(_ent_counter), a		;cargamos en el punto de la constante del contador de entidades por las que hay que ir iterando
-                     0067    74 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
-   0065 DD 21 00 00   [14]   75 	ld ix, #0x0000
-                             76 
-   0069                      77 	_loop:
-   0069 DD 7E 0A      [19]   78 		ld a, e_ai_st(ix)		;status de ia
-   006C FE 00         [ 7]   79 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
-   006E 28 0A         [12]   80 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
-                             81 
-   0070                      82 		_AIent:
-   0070 FE 01         [ 7]   83 			cp #e_ai_st_stand_by	;comparamos la variable e_ai_st(status) con la constante de standby
-   0072 CC 09 00      [17]   84 			call z, sys_ai_stand_by	;vamos a la rutina de standby
-   0075 FE 02         [ 7]   85 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
-   0077 CC 23 00      [17]   86 			call z, sys_ai_move_to
-                             87 
-   007A                      88 		_no_AI_ent:
-                     007B    89 		_ent_counter=.+1
-   007A 3E 00         [ 7]   90 			ld a, #0		;|
-   007C 3D            [ 4]   91 			dec a			;|
-   007D C8            [11]   92 			ret z			;|si ya se ha pasado por todas las unidades se sale de la rurina	
-                             93 
-   007E 32 7B 00      [13]   94 			ld (_ent_counter), a	;|
-   0081 11 0D 00      [10]   95 			ld de, #sizeof_e		;|
-   0084 DD 19         [15]   96 			add ix, de			;|se pasa a la siguiente entidad
+                     0064    73 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+   0062 DD 21 00 00   [14]   74 	ld ix, #0x0000			;desde init se utiliza código automodificable para cargar en ix la posición constante del puntero al array de entidades
+                             75 
+   0066                      76 	_loop:
+   0066 DD 7E 04      [19]   77 		ld a, e_w(ix)		;|
+   0069 B7            [ 4]   78 		or a				;|
+   006A C8            [11]   79 		ret z				;|sw comprueva si la entidad es válida e_w(ix)!=0
+                             80 
+   006B DD 7E 0A      [19]   81 		ld a, e_ai_st(ix)		;status de ia
+   006E FE 00         [ 7]   82 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
+   0070 28 0A         [12]   83 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
+                             84 
+   0072                      85 		_AIent:
+   0072 FE 01         [ 7]   86 			cp #e_ai_st_stand_by	;comparamos la variable e_ai_st(status) con la constante de standby
+   0074 CC 09 00      [17]   87 			call z, sys_ai_stand_by	;vamos a la rutina de standby
+   0077 FE 02         [ 7]   88 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
+   0079 CC 23 00      [17]   89 			call z, sys_ai_move_to
+                             90 
+   007C                      91 		_no_AI_ent:
+                             92 
+   007C 11 0D 00      [10]   93 			ld de, #sizeof_e		;|
+   007F DD 19         [15]   94 			add ix, de			;|se pasa a la siguiente entidad
+                             95 
+   0081 18 E3         [12]   96 			jr _loop
                              97 
-   0086 18 E1         [12]   98 			jr _loop
-                             99 
-   0088 C9            [10]  100 ret
+                             98 ;ret

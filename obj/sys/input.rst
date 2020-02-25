@@ -2576,68 +2576,72 @@ Hexadecimal [16-Bits]
 
 
                               5 
-   41E0                       6 sys_input_init::
-   41E0 C9            [10]    7 ret
-                              8 
-                              9 ;UPDATE La actualización del sistema de input lo que hace es actualizar excusivamente
-                             10 ;la entidad "0" que es el player por defecto
-                             11 ;INPUT IX = POINTER TO ENTITY[0]
-                             12 
-   41E1                      13 sys_input_update::
+                              6 ;INPUT IX = POINTER TO ENTITY[0]
+   41D9                       7 sys_input_init::
+   41D9 DD 22 E0 41   [20]    8 	ld (_ent_array_ptr), ix
+   41DD C9            [10]    9 ret
+                             10 
+                             11 ;UPDATE La actualización del sistema de input lo que hace es actualizar excusivamente
+                             12 ;la entidad "0" que es el player por defecto
+                             13 ;INPUT IX = POINTER TO ENTITY[0]
                              14 
-   41E1 DD 36 02 00   [19]   15 	ld e_vx(ix), #0
-   41E5 DD 36 03 00   [19]   16 	ld e_vy(ix), #0	;ponemos velocidad y,x de la entidad a cero
-                             17 
-   41E9 CD DB 42      [17]   18 	call cpct_scanKeyboard_f_asm
-                             19 
-   41EC 21 04 04      [10]   20 	ld hl, #Key_O			;A 16-bit value containing a Matrix-Line(1B, L) and a BitMask(1B, H).
-   41EF CD 45 43      [17]   21 	call cpct_isKeyPressed_asm	
-   41F2 28 04         [12]   22 	jr z, O_NotPressed
+   41DE                      15 sys_input_update::
+                     0007    16 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+   41DE DD 21 00 00   [14]   17 	ld ix, #0x0000			;codigo automodificable desde el init
+                             18 
+   41E2 DD 36 02 00   [19]   19 	ld e_vx(ix), #0
+   41E6 DD 36 03 00   [19]   20 	ld e_vy(ix), #0	;ponemos velocidad y,x de la entidad a cero
+                             21 
+   41EA CD E9 42      [17]   22 	call cpct_scanKeyboard_f_asm
                              23 
-   41F4                      24 	O_pressed:
-   41F4 DD 36 02 FF   [19]   25 		ld e_vx(ix), #-1
-                             26 
-   41F8                      27 	O_NotPressed:
-                             28 
-   41F8 21 03 08      [10]   29 	ld hl, #Key_P
-   41FB CD 45 43      [17]   30 	call cpct_isKeyPressed_asm	
-   41FE 28 04         [12]   31 	jr z, P_NotPressed
+   41ED 21 04 04      [10]   24 	ld hl, #Key_O			;A 16-bit value containing a Matrix-Line(1B, L) and a BitMask(1B, H).
+   41F0 CD 53 43      [17]   25 	call cpct_isKeyPressed_asm	
+   41F3 28 04         [12]   26 	jr z, O_NotPressed
+                             27 
+   41F5                      28 	O_pressed:
+   41F5 DD 36 02 FF   [19]   29 		ld e_vx(ix), #-1
+                             30 
+   41F9                      31 	O_NotPressed:
                              32 
-   4200                      33 	P_pressed:
-   4200 DD 36 02 01   [19]   34 		ld e_vx(ix), #1
-                             35 
-   4204                      36 	P_NotPressed:
-                             37 
-   4204 21 08 08      [10]   38 	ld hl, #Key_Q
-   4207 CD 45 43      [17]   39 	call cpct_isKeyPressed_asm	
-   420A 28 04         [12]   40 	jr z, Q_NotPressed
+   41F9 21 03 08      [10]   33 	ld hl, #Key_P
+   41FC CD 53 43      [17]   34 	call cpct_isKeyPressed_asm	
+   41FF 28 04         [12]   35 	jr z, P_NotPressed
+                             36 
+   4201                      37 	P_pressed:
+   4201 DD 36 02 01   [19]   38 		ld e_vx(ix), #1
+                             39 
+   4205                      40 	P_NotPressed:
                              41 
-   420C                      42 	Q_pressed:
-   420C DD 36 03 FE   [19]   43 		ld e_vy(ix), #-2
-                             44 
-   4210                      45 	Q_NotPressed:
-                             46 
-   4210 21 08 20      [10]   47 	ld hl, #Key_A
-   4213 CD 45 43      [17]   48 	call cpct_isKeyPressed_asm	
-   4216 28 04         [12]   49 	jr z, A_NotPressed
+   4205 21 08 08      [10]   42 	ld hl, #Key_Q
+   4208 CD 53 43      [17]   43 	call cpct_isKeyPressed_asm	
+   420B 28 04         [12]   44 	jr z, Q_NotPressed
+                             45 
+   420D                      46 	Q_pressed:
+   420D DD 36 03 FE   [19]   47 		ld e_vy(ix), #-2
+                             48 
+   4211                      49 	Q_NotPressed:
                              50 
-   4218                      51 	A_pressed:
-   4218 DD 36 03 02   [19]   52 		ld e_vy(ix), #2
-                             53 
-   421C                      54 	A_NotPressed:
-                             55 		;PLACEHOLDER SI PRESIONAMOS UNA TECLA CAMBIAMOS EL COMPORTAMIENTO DEL SISTEMA DE IA DE LAS ENTIDADES CON IA
-   421C DD 36 08 00   [19]   56 		ld e_ai_aim_X(ix), #0	;reiniciamos esta variable a 0 que será la que comprovaremos
+   4211 21 08 20      [10]   51 	ld hl, #Key_A
+   4214 CD 53 43      [17]   52 	call cpct_isKeyPressed_asm	
+   4217 28 04         [12]   53 	jr z, A_NotPressed
+                             54 
+   4219                      55 	A_pressed:
+   4219 DD 36 03 02   [19]   56 		ld e_vy(ix), #2
                              57 
-   4220 21 05 80      [10]   58 	ld hl, #Key_Space
-   4223 CD 45 43      [17]   59 	call cpct_isKeyPressed_asm	
+   421D                      58 	A_NotPressed:
+                             59 		;PLACEHOLDER SI PRESIONAMOS UNA TECLA CAMBIAMOS EL COMPORTAMIENTO DEL SISTEMA DE IA DE LAS ENTIDADES CON IA
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 53.
 Hexadecimal [16-Bits]
 
 
 
-   4226 28 04         [12]   60 	jr z, spc_NotPressed
-   4228                      61 	spc_pressed:
-   4228 DD 36 08 01   [19]   62 		ld e_ai_aim_X(ix), #1	;cambiamos temporalmente el valor de esta variable para que la compruebe el sistema de IA 
-                             63 
-   422C                      64 	spc_NotPressed:
-   422C C9            [10]   65 ret
+   421D DD 36 08 00   [19]   60 		ld e_ai_aim_X(ix), #0	;reiniciamos esta variable a 0 que será la que comprovaremos
+                             61 
+   4221 21 05 80      [10]   62 	ld hl, #Key_Space
+   4224 CD 53 43      [17]   63 	call cpct_isKeyPressed_asm	
+   4227 28 04         [12]   64 	jr z, spc_NotPressed
+   4229                      65 	spc_pressed:
+   4229 DD 36 08 01   [19]   66 		ld e_ai_aim_X(ix), #1	;cambiamos temporalmente el valor de esta variable para que la compruebe el sistema de IA 
+                             67 
+   422D                      68 	spc_NotPressed:
+   422D C9            [10]   69 ret

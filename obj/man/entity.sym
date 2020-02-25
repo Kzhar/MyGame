@@ -66,8 +66,8 @@ Symbol Table
     e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000C 
     e_lastVP=  000B     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
     e_vx    =  0002     |     e_vy    =  0003     |     e_w     =  0004 
-    e_x     =  0000     |     e_y     =  0001     |   0 man_enti   0057 GR
-  0 man_enti   0044 GR  |   0 man_enti   004C GR  |   0 man_enti   0063 GR
+    e_x     =  0000     |     e_y     =  0001     |   0 man_enti   005C GR
+  0 man_enti   0049 GR  |   0 man_enti   0051 GR  |   0 man_enti   0068 GR
     max_enti=  0005 G   |     opc_DI  =  00F3     |     opc_EI  =  00FB 
     opc_JR  =  0018     |     opc_LD_D=  0016     |     sizeof_e=  000D 
 
@@ -76,5 +76,5 @@ Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   74   flags    0
+   0 _CODE      size   7F   flags    0
 

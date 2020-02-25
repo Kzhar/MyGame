@@ -3,6 +3,7 @@
 
 .include "man/entity.h.s"
 .include "cmp/entity.h.s"
+;.include "cmp/array_structure.h.s"
 .include "sys/render.h.s"
 .include "assets/assets.h.s"
 .include "sys/input.h.s"
@@ -16,11 +17,11 @@ sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
 man_game_init::
 	call man_entity_init	;resetea el número de entidades a cero
 
-	call man_entity_getArray	;|	
+	call man_entity_getArray		;en todos los init se utiliza código automodificable para cargar el puntero de la posición del inicio del array de entidades
 	call sys_ai_control_init	;|utilizamos getArray porque utilizamos el init para meter el puntero al array en ix en el update mediante CODAUTMOD
-	call sys_eren_init
 	call sys_input_init
 	call sys_physics_init
+	call sys_eren_init
 
 
 	ld hl, #player
@@ -32,16 +33,12 @@ man_game_init::
 ret
 
 man_game_update::
-	call man_entity_getArray
 	call sys_input_update
-	call man_entity_getArray	;¡¡¡¡de momento hay que pasar esto, puntero a entidades en ix ya no hace falta pasarlo, pero hasta próxima modificación si que hay que pasar número de entidades en a
 	call sys_ai_control_update
-	call man_entity_getArray
 	call sys_pysics_update
 ret
 
 man_game_render::
-	call man_entity_getArray
 	call sys_eren_update
 ret
 

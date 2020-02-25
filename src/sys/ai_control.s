@@ -3,7 +3,7 @@
 .module sys_ai_control
 
 sys_ai_control_init::
-	ld (_ent_array_prt_tmp_standby), IX
+	ld (_ent_array_prt_tmp_standby), ix
 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
 ret
 
@@ -70,11 +70,14 @@ sys_ai_move_to:
 ret
 
 sys_ai_control_update::
-	ld(_ent_counter), a		;cargamos en el punto de la constante del contador de entidades por las que hay que ir iterando
 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
-	ld ix, #0x0000
+	ld ix, #0x0000			;desde init se utiliza código automodificable para cargar en ix la posición constante del puntero al array de entidades
 
 	_loop:
+		ld a, e_w(ix)		;|
+		or a				;|
+		ret z				;|sw comprueva si la entidad es válida e_w(ix)!=0
+
 		ld a, e_ai_st(ix)		;status de ia
 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
@@ -86,15 +89,10 @@ sys_ai_control_update::
 			call z, sys_ai_move_to
 
 		_no_AI_ent:
-		_ent_counter=.+1
-			ld a, #0		;|
-			dec a			;|
-			ret z			;|si ya se ha pasado por todas las unidades se sale de la rurina	
 
-			ld (_ent_counter), a	;|
 			ld de, #sizeof_e		;|
 			add ix, de			;|se pasa a la siguiente entidad
 
 			jr _loop
 
-ret
+;ret

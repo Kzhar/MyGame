@@ -62,6 +62,11 @@ man_entity_new::
 	ld bc, #sizeof_e
 	add hl, bc
 	ld (_entity_pend), hl	;AHORA EL PUNTERO PARA LA CREAR LA SIGUIENTE UNIDAD SE MUEVE EL TAMAÑO DE UNA ENTIDAD EN EL ARRAY
-
+	
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+	ld (hl), #0x00			;se rellena con 0 la teórica posición ew_x de la siguiente entidad, lo que significa que la entidad es no valida
 
 ret

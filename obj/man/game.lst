@@ -68,52 +68,58 @@ Hexadecimal [16-Bits]
 
 
 
-                              6 .include "sys/render.h.s"
-                              1 .globl sys_eren_init
-                              2 .globl sys_eren_update
-                              3 .globl man_game_update
+                              6 ;.include "cmp/array_structure.h.s"
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 5.
 Hexadecimal [16-Bits]
 
 
 
-                              7 .include "assets/assets.h.s"
-                              1 .globl _pal_main
-                              2 .globl _sp_mainchar
-                              3 .globl _sp_redball
-                              4 .globl _sp_sword
+                              7 .include "sys/render.h.s"
+                              1 .globl sys_eren_init
+                              2 .globl sys_eren_update
+                              3 .globl man_game_update
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 6.
 Hexadecimal [16-Bits]
 
 
 
-                              8 .include "sys/input.h.s"
-                              1 .globl sys_input_init
-                              2 .globl sys_input_update
+                              8 .include "assets/assets.h.s"
+                              1 .globl _pal_main
+                              2 .globl _sp_mainchar
+                              3 .globl _sp_redball
+                              4 .globl _sp_sword
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 7.
 Hexadecimal [16-Bits]
 
 
 
-                              9 .include "sys/ai_control.h.s"
-                              1 .globl sys_ai_control_init
-                              2 .globl sys_ai_control_update
+                              9 .include "sys/input.h.s"
+                              1 .globl sys_input_init
+                              2 .globl sys_input_update
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 8.
 Hexadecimal [16-Bits]
 
 
 
-                             10 .include "sys/physics.h.s"
-                              1 .globl sys_physics_init
-                              2 .globl sys_pysics_update
+                             10 .include "sys/ai_control.h.s"
+                              1 .globl sys_ai_control_init
+                              2 .globl sys_ai_control_update
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 9.
 Hexadecimal [16-Bits]
 
 
 
-                             11 
-                             12 ;Definimos una estructura con datos para player
-   0000                      13 player: 	DefineCmp_Entity 0, 0, 1, 2, 4, 16, _sp_mainchar, e_ai_st_noAI
+                             11 .include "sys/physics.h.s"
+                              1 .globl sys_physics_init
+                              2 .globl sys_pysics_update
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 10.
+Hexadecimal [16-Bits]
+
+
+
+                             12 
+                             13 ;Definimos una estructura con datos para player
+   0000                      14 player: 	DefineCmp_Entity 0, 0, 1, 2, 4, 16, _sp_mainchar, e_ai_st_noAI
    0000 00 00                 1 	.db 0, 0		;posición
    0002 01 02                 2 	.db 1, 2	;velocidad
    0004 04 10                 3 	.db 4, 16		;tamaño
@@ -121,7 +127,7 @@ Hexadecimal [16-Bits]
    0008 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    000A 00                    6 	.db e_ai_st_noAI		
    000B CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   000D                      14 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
+   000D                      15 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
    000D 46 28                 1 	.db 70, 40		;posición
    000F FF FE                 2 	.db 0xFF, 0xFE	;velocidad
    0011 02 08                 3 	.db 2, 8		;tamaño
@@ -129,7 +135,7 @@ Hexadecimal [16-Bits]
    0015 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    0017 01                    6 	.db e_ai_st_stand_by		
    0018 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   001A                      15 sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
+   001A                      16 sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
    001A 28 78                 1 	.db 40, 120		;posición
    001C 02 FC                 2 	.db 2, 0xFC	;velocidad
    001E 03 04                 3 	.db 3, 4		;tamaño
@@ -137,40 +143,31 @@ Hexadecimal [16-Bits]
    0022 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    0024 00                    6 	.db e_ai_st_noAI		
    0025 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   0027                      16 man_game_init::
-   0027 CD 00 00      [17]   17 	call man_entity_init	;resetea el número de entidades a cero
-                             18 
-   002A CD 00 00      [17]   19 	call man_entity_getArray	;|	
-   002D CD 00 00      [17]   20 	call sys_ai_control_init	;|utilizamos getArray porque utilizamos el init para meter el puntero al array en ix en el update mediante CODAUTMOD
-   0030 CD 00 00      [17]   21 	call sys_eren_init
-   0033 CD 00 00      [17]   22 	call sys_input_init
-   0036 CD 00 00      [17]   23 	call sys_physics_init
-                             24 
+   0027                      17 man_game_init::
+   0027 CD 00 00      [17]   18 	call man_entity_init	;resetea el número de entidades a cero
+                             19 
+   002A CD 00 00      [17]   20 	call man_entity_getArray		;en todos los init se utiliza código automodificable para cargar el puntero de la posición del inicio del array de entidades
+   002D CD 00 00      [17]   21 	call sys_ai_control_init	;|utilizamos getArray porque utilizamos el init para meter el puntero al array en ix en el update mediante CODAUTMOD
+   0030 CD 00 00      [17]   22 	call sys_input_init
+   0033 CD 00 00      [17]   23 	call sys_physics_init
+   0036 CD 00 00      [17]   24 	call sys_eren_init
                              25 
-   0039 21 00 00      [10]   26 	ld hl, #player
-   003C CD 00 00      [17]   27 	call man_entity_create	;copia los valores a los que apunta hl en el primer sitio libre para crear una nueva entidad
-   003F 21 0D 00      [10]   28 	ld hl, #redball
-   0042 CD 00 00      [17]   29 	call man_entity_create
-   0045 21 1A 00      [10]   30 	ld hl, #sword
-   0048 CD 00 00      [17]   31 	call man_entity_create
-   004B C9            [10]   32 ret
-                             33 
-   004C                      34 man_game_update::
-   004C CD 00 00      [17]   35 	call man_entity_getArray
-   004F CD 00 00      [17]   36 	call sys_input_update
-   0052 CD 00 00      [17]   37 	call man_entity_getArray	;¡¡¡¡de momento hay que pasar esto, puntero a entidades en ix ya no hace falta pasarlo, pero hasta próxima modificación si que hay que pasar número de entidades en a
-   0055 CD 00 00      [17]   38 	call sys_ai_control_update
-   0058 CD 00 00      [17]   39 	call man_entity_getArray
-   005B CD 00 00      [17]   40 	call sys_pysics_update
-   005E C9            [10]   41 ret
-                             42 
-   005F                      43 man_game_render::
-   005F CD 00 00      [17]   44 	call man_entity_getArray
-ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 10.
-Hexadecimal [16-Bits]
-
-
-
-   0062 CD 00 00      [17]   45 	call sys_eren_update
-   0065 C9            [10]   46 ret
-                             47 
+                             26 
+   0039 21 00 00      [10]   27 	ld hl, #player
+   003C CD 00 00      [17]   28 	call man_entity_create	;copia los valores a los que apunta hl en el primer sitio libre para crear una nueva entidad
+   003F 21 0D 00      [10]   29 	ld hl, #redball
+   0042 CD 00 00      [17]   30 	call man_entity_create
+   0045 21 1A 00      [10]   31 	ld hl, #sword
+   0048 CD 00 00      [17]   32 	call man_entity_create
+   004B C9            [10]   33 ret
+                             34 
+   004C                      35 man_game_update::
+   004C CD 00 00      [17]   36 	call sys_input_update
+   004F CD 00 00      [17]   37 	call sys_ai_control_update
+   0052 CD 00 00      [17]   38 	call sys_pysics_update
+   0055 C9            [10]   39 ret
+                             40 
+   0056                      41 man_game_render::
+   0056 CD 00 00      [17]   42 	call sys_eren_update
+   0059 C9            [10]   43 ret
+                             44 

@@ -3,7 +3,9 @@
 .include "cpct_functions.h.s"
 .include "cmp/entity.h.s"
 
+;INPUT IX = POINTER TO ENTITY[0]
 sys_input_init::
+	ld (_ent_array_ptr), ix
 ret
 
 ;UPDATE La actualización del sistema de input lo que hace es actualizar excusivamente
@@ -11,6 +13,8 @@ ret
 ;INPUT IX = POINTER TO ENTITY[0]
 
 sys_input_update::
+	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+	ld ix, #0x0000			;codigo automodificable desde el init
 
 	ld e_vx(ix), #0
 	ld e_vy(ix), #0	;ponemos velocidad y,x de la entidad a cero

@@ -4,7 +4,7 @@ Hexadecimal [16-Bits]
 Symbol Table
 
     .__.$$$.=  2710 L   |     .__.ABS.=  0000 G   |     .__.CPU.=  0000 L
-    .__.H$L.=  0000 L   |   0 A_NotPre   003C R   |   0 A_presse   0038 R
+    .__.H$L.=  0000 L   |   0 A_NotPre   0044 R   |   0 A_presse   0040 R
     CPCT_VME=  C000     |     CRTC_SEL=  00BC     |     CRTC_SET=  00BD 
     FW_BLACK=  0000     |     FW_BLUE =  0001     |     FW_BRIGH=  0002 
     FW_BRIGH=  0014     |     FW_BRIGH=  0012     |     FW_BRIGH=  0008 
@@ -53,33 +53,33 @@ Symbol Table
     Key_Shif=  2002     |     Key_Slas=  4003     |     Key_Spac=  8005 
     Key_T   =  0806     |     Key_Tab =  1008     |     Key_U   =  0405 
     Key_V   =  8006     |     Key_W   =  0807     |     Key_X   =  8007 
-    Key_Y   =  0805     |     Key_Z   =  8008     |   0 O_NotPre   0018 R
-  0 O_presse   0014 R   |     PAL_INKR=  0040     |     PAL_PENR=  0000 
-    PPI_PORT=  00F5     |   0 P_NotPre   0024 R   |   0 P_presse   0020 R
-  0 Q_NotPre   0030 R   |   0 Q_presse   002C R   |     cpct_dis   **** GX
-    cpct_dra   **** GX  |     cpct_dra   **** GX  |     cpct_get   **** GX
+    Key_Y   =  0805     |     Key_Z   =  8008     |   0 O_NotPre   0020 R
+  0 O_presse   001C R   |     PAL_INKR=  0040     |     PAL_PENR=  0000 
+    PPI_PORT=  00F5     |   0 P_NotPre   002C R   |   0 P_presse   0028 R
+  0 Q_NotPre   0038 R   |   0 Q_presse   0034 R   |   0 _ent_arr=  0007 R
+    cpct_dis   **** GX  |     cpct_dra   **** GX  |     cpct_dra   **** GX
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
 Symbol Table
 
-    cpct_isK   **** GX  |     cpct_pag=  0000     |     cpct_pag=  0010 
-    cpct_pag=  0020     |     cpct_pag=  0030     |     cpct_sca   **** GX
-    cpct_set   **** GX  |     cpct_set   **** GX  |     cpct_wai   **** GX
-    e_ai_aim=  0008     |     e_ai_aim=  0009     |     e_ai_st =  000A 
-    e_ai_st_=  0002     |     e_ai_st_=  0000     |     e_ai_st_=  0001 
-    e_h     =  0005     |     e_lastVP=  000C     |     e_lastVP=  000B 
-    e_pspr_h=  0007     |     e_pspr_l=  0006     |     e_vx    =  0002 
-    e_vy    =  0003     |     e_w     =  0004     |     e_x     =  0000 
-    e_y     =  0001     |     opc_DI  =  00F3     |     opc_EI  =  00FB 
-    opc_JR  =  0018     |     opc_LD_D=  0016     |     sizeof_e=  000D 
-  0 spc_NotP   004C R   |   0 spc_pres   0048 R   |   0 sys_inpu   0000 GR
-  0 sys_inpu   0001 GR
+    cpct_get   **** GX  |     cpct_isK   **** GX  |     cpct_pag=  0000 
+    cpct_pag=  0010     |     cpct_pag=  0020     |     cpct_pag=  0030 
+    cpct_sca   **** GX  |     cpct_set   **** GX  |     cpct_set   **** GX
+    cpct_wai   **** GX  |     e_ai_aim=  0008     |     e_ai_aim=  0009 
+    e_ai_st =  000A     |     e_ai_st_=  0002     |     e_ai_st_=  0000 
+    e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000C 
+    e_lastVP=  000B     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
+    e_vx    =  0002     |     e_vy    =  0003     |     e_w     =  0004 
+    e_x     =  0000     |     e_y     =  0001     |     opc_DI  =  00F3 
+    opc_EI  =  00FB     |     opc_JR  =  0018     |     opc_LD_D=  0016 
+    sizeof_e=  000D     |   0 spc_NotP   0054 R   |   0 spc_pres   0050 R
+  0 sys_inpu   0000 GR  |   0 sys_inpu   0005 GR
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
 Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   4D   flags    0
+   0 _CODE      size   55   flags    0
 

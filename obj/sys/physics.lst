@@ -73,7 +73,8 @@ Hexadecimal [16-Bits]
                              16 	.rept _N
                              17 		_DefineTypeMacroDefault
                              18 	.endm
-                             19 .endm
+                             19 	.db #0xDE, #0xAD, #0x00, #0x00, #0x00			;se crean tres nuevos bytes al final del array de forma provisional 
+                             20 .endm
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 4.
 Hexadecimal [16-Bits]
 
@@ -85,64 +86,72 @@ Hexadecimal [16-Bits]
                      00C8     5 screen_height = 200
                               6 
    0000                       7 sys_physics_init::
-   0000 C9            [10]    8 ret
-                              9 
-                             10 ;INPUT: 	IX POINTER TO ENTITY ARRAY
-                             11 ;		A NUMBER OF ELEMENTS IN THE ARRAY
-   0001                      12 sys_pysics_update::
-   0001 47            [ 4]   13 	ld b, a	;b number of entities in the array
-                             14 
-   0002                      15 _update_loop:
-   0002 3E 51         [ 7]   16 	ld a, #screen_width + 1
-   0004 DD 96 04      [19]   17 	sub e_w(ix)
-   0007 4F            [ 4]   18 	ld c, a			;C = posición máxima de la entidad + 1
+   0000 DD 22 07 00   [20]    8 	ld (_ent_array_ptr), ix
+   0004 C9            [10]    9 ret
+                             10 
+                             11 ;INPUT: 	IX POINTER TO ENTITY ARRAY
+                             12 ;		A NUMBER OF ELEMENTS IN THE ARRAY
+   0005                      13 sys_pysics_update::
+                     0007    14 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+   0005 DD 21 00 00   [14]   15 	ld ix, #0x0000			;
+                             16 	;ld b, a	;b number of entities in the array
+                             17 
+   0009                      18 _update_loop:
                              19 
-   0008 DD 7E 00      [19]   20 	ld a, e_x(ix)		;A = Posición actual
-   000B DD 86 02      [19]   21 	add e_vx(ix)		;A = Posición actual + velocidad
-   000E B9            [ 4]   22 	cp c				;comparar con la posición maxima mas uno (si es la máxima daría cero)
-   000F 30 05         [12]   23 	jr nc, invalid_x
-                             24 
-   0011                      25 	valid_x:
-   0011 DD 77 00      [19]   26 		ld e_x(ix), a	;cargar en e_x la nueva posición
-   0014 18 08         [12]   27 		jr endif_x
-                             28 
-   0016                      29 	invalid_x:
-   0016 DD 7E 02      [19]   30 		ld a, e_vx(ix)
-   0019 ED 44         [ 8]   31 		neg
-   001B DD 77 02      [19]   32 		ld e_vx(ix), a		;se invierte la velocidad en x
-                             33 
-   001E                      34 	endif_x:
-                             35 
-   001E 3E C9         [ 7]   36 	ld a, #screen_height + 1
-   0020 DD 96 05      [19]   37 	sub e_h(ix)
-   0023 4F            [ 4]   38 	ld c, a				;C = posición máxima de la entidad + 1
-                             39 
-   0024 DD 7E 01      [19]   40 	ld a, e_y(ix)
-   0027 DD 86 03      [19]   41 	add e_vy(ix)
-   002A B9            [ 4]   42 	cp c					;comparar con la posición máxima + 1 
-   002B 30 05         [12]   43 	jr nc, invalid_y
-                             44 
-   002D                      45 	valid_y:
-   002D DD 77 01      [19]   46 		ld e_y(ix), a	;cargar en e_y la nueva posición
-   0030 18 08         [12]   47 		jr endif_y
-                             48 
-   0032                      49 	invalid_y:
-   0032 DD 7E 03      [19]   50 		ld a, e_vy(ix)
-   0035 ED 44         [ 8]   51 		neg
-   0037 DD 77 03      [19]   52 		ld e_vy(ix), a	;se invierte la velocidad en y
-                             53 
-   003A                      54 	endif_y:
-                             55 
-   003A 05            [ 4]   56 	dec b		;numero de entidades en el array
+   0009 DD 7E 04      [19]   20 	ld a, e_w(ix)
+   000C B7            [ 4]   21 	or a
+   000D C8            [11]   22 	ret z
+                             23 
+   000E 3E 51         [ 7]   24 	ld a, #screen_width + 1
+   0010 DD 96 04      [19]   25 	sub e_w(ix)
+   0013 4F            [ 4]   26 	ld c, a			;C = posición máxima de la entidad + 1
+                             27 
+   0014 DD 7E 00      [19]   28 	ld a, e_x(ix)		;A = Posición actual
+   0017 DD 86 02      [19]   29 	add e_vx(ix)		;A = Posición actual + velocidad
+   001A B9            [ 4]   30 	cp c				;comparar con la posición maxima mas uno (si es la máxima daría cero)
+   001B 30 05         [12]   31 	jr nc, invalid_x
+                             32 
+   001D                      33 	valid_x:
+   001D DD 77 00      [19]   34 		ld e_x(ix), a	;cargar en e_x la nueva posición
+   0020 18 08         [12]   35 		jr endif_x
+                             36 
+   0022                      37 	invalid_x:
+   0022 DD 7E 02      [19]   38 		ld a, e_vx(ix)
+   0025 ED 44         [ 8]   39 		neg
+   0027 DD 77 02      [19]   40 		ld e_vx(ix), a		;se invierte la velocidad en x
+                             41 
+   002A                      42 	endif_x:
+                             43 
+   002A 3E C9         [ 7]   44 	ld a, #screen_height + 1
+   002C DD 96 05      [19]   45 	sub e_h(ix)
+   002F 4F            [ 4]   46 	ld c, a				;C = posición máxima de la entidad + 1
+                             47 
+   0030 DD 7E 01      [19]   48 	ld a, e_y(ix)
+   0033 DD 86 03      [19]   49 	add e_vy(ix)
+   0036 B9            [ 4]   50 	cp c					;comparar con la posición máxima + 1 
+   0037 30 05         [12]   51 	jr nc, invalid_y
+                             52 
+   0039                      53 	valid_y:
+   0039 DD 77 01      [19]   54 		ld e_y(ix), a	;cargar en e_y la nueva posición
+   003C 18 08         [12]   55 		jr endif_y
+                             56 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 5.
 Hexadecimal [16-Bits]
 
 
 
-   003B C8            [11]   57 	ret z
-                             58 
-   003C 11 0D 00      [10]   59 	ld de, #sizeof_e
-   003F DD 19         [15]   60 	add ix, de			;ix apunta a la siguiente entidad
-   0041 18 BF         [12]   61 	jr _update_loop
-                             62 
+   003E                      57 	invalid_y:
+   003E DD 7E 03      [19]   58 		ld a, e_vy(ix)
+   0041 ED 44         [ 8]   59 		neg
+   0043 DD 77 03      [19]   60 		ld e_vy(ix), a	;se invierte la velocidad en y
+                             61 
+   0046                      62 	endif_y:
                              63 
+                             64 	;dec b		;numero de entidades en el array
+                             65 	;ret z
+                             66 
+   0046 11 0D 00      [10]   67 	ld de, #sizeof_e
+   0049 DD 19         [15]   68 	add ix, de			;ix apunta a la siguiente entidad
+   004B 18 BC         [12]   69 	jr _update_loop
+                             70 
+                             71 

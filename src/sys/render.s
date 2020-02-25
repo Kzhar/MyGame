@@ -7,6 +7,7 @@
 screen_start = 0xC000
 
 sys_eren_init::
+	ld (_ent_array_ptr), ix
 	ld c, #0
 	call cpct_setVideoMode_asm 	;pone el modo de video según el parámetro de c (0-3)
 
@@ -23,9 +24,14 @@ sys_eren_update::
 ret
 
 sys_eren_render_entities::
-	ld (_ent_counter), a	;codigo automodificable
+	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+	ld ix, #0x0000
+	;ld (_ent_counter), a	;codigo automodificable
 
 	_update_loop:
+	ld a, e_w(ix)
+	or a
+	ret z				;comprobar si la entidad es válida, y si no salir del bucle
 
 	ld e, e_lastVP_l(ix)	;
 	ld d, e_lastVP_h(ix)	;de posición antes del nuevo dibujado
@@ -50,12 +56,12 @@ sys_eren_render_entities::
 	pop bc				;BC tamaño del sptite
 	call cpct_drawSprite_asm
 
-	_ent_counter =.+1 		;constante que marca la posicíón de memoria a modificar para modificar el código
-	ld a, #0				;en este caso cargaremos en a el número de entidades que quedan por renderizar
-	dec a
-	ret z					;si no queda ninguna por renderizar se sale del bucle
+	;_ent_counter =.+1 		;constante que marca la posicíón de memoria a modificar para modificar el código
+	;ld a, #0				;en este caso cargaremos en a el número de entidades que quedan por renderizar
+	;dec a
+	;ret z					;si no queda ninguna por renderizar se sale del bucle
 
-	ld (_ent_counter), a		;si no ahora la posición de ld ? (_ent counter) vale uno menos
+	;ld (_ent_counter), a		;si no ahora la posición de ld ? (_ent counter) vale uno menos
 
 	ld bc, #sizeof_e
 	add ix, bc				;ix apunta a la siguente entidad y A => entidades pendientes de renderizar

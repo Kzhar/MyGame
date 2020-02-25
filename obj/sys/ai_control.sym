@@ -4,23 +4,23 @@ Hexadecimal [16-Bits]
 Symbol Table
 
     .__.$$$.=  2710 L   |     .__.ABS.=  0000 G   |     .__.CPU.=  0000 L
-    .__.H$L.=  0000 L   |   0 _AIent     0070 R   |   0 _arrived   0039 R
+    .__.H$L.=  0000 L   |   0 _AIent     0072 R   |   0 _arrived   0039 R
   0 _arrived   0053 R   |   0 _endif_x   003D R   |   0 _endif_y   0061 R
-  0 _ent_arr=  000B R   |   0 _ent_arr=  0067 R   |   0 _ent_cou=  007B R
-  0 _loop      0069 R   |   0 _no_AI_e   007A R   |   0 _objx_gr   0031 R
-  0 _objx_le   002B R   |   0 _objy_gr   004B R   |   0 _objy_le   0045 R
-    e_ai_aim=  0008     |     e_ai_aim=  0009     |     e_ai_st =  000A 
-    e_ai_st_=  0002     |     e_ai_st_=  0000     |     e_ai_st_=  0001 
-    e_h     =  0005     |     e_lastVP=  000C     |     e_lastVP=  000B 
-    e_pspr_h=  0007     |     e_pspr_l=  0006     |     e_vx    =  0002 
-    e_vy    =  0003     |     e_w     =  0004     |     e_x     =  0000 
-    e_y     =  0001     |     sizeof_e=  000D     |   0 sys_ai_c   0000 GR
-  0 sys_ai_c   0062 GR  |   0 sys_ai_m   0023 R   |   0 sys_ai_s   0009 R
+  0 _ent_arr=  000B R   |   0 _ent_arr=  0064 R   |   0 _loop      0066 R
+  0 _no_AI_e   007C R   |   0 _objx_gr   0031 R   |   0 _objx_le   002B R
+  0 _objy_gr   004B R   |   0 _objy_le   0045 R   |     e_ai_aim=  0008 
+    e_ai_aim=  0009     |     e_ai_st =  000A     |     e_ai_st_=  0002 
+    e_ai_st_=  0000     |     e_ai_st_=  0001     |     e_h     =  0005 
+    e_lastVP=  000C     |     e_lastVP=  000B     |     e_pspr_h=  0007 
+    e_pspr_l=  0006     |     e_vx    =  0002     |     e_vy    =  0003 
+    e_w     =  0004     |     e_x     =  0000     |     e_y     =  0001 
+    sizeof_e=  000D     |   0 sys_ai_c   0000 GR  |   0 sys_ai_c   0062 GR
+  0 sys_ai_m   0023 R   |   0 sys_ai_s   0009 R
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   89   flags    0
+   0 _CODE      size   83   flags    0
 

@@ -16,4 +16,5 @@
 	.rept _N
 		_DefineTypeMacroDefault
 	.endm
+	.db #0xDE, #0xAD, #0x00, #0x00, #0x00			;se crean tres nuevos bytes al final del array de forma provisional 
 .endm
