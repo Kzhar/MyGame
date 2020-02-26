@@ -16,12 +16,13 @@ sys_ai_stand_by:
 			ret z
 
 			;PRESSED KEY, MOVER PLACEHOLDER
-			ld a, e_x(iy)				;cargamos en a la posición del primer elemento del array de entidades, el player	
-			ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
-			ld a, e_y(iy)				;|
-			ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
-
-			ld e_ai_st(ix), #e_ai_st_move_to	;nuevo estado de la entidad, move_to
+			;ld a, e_x(iy)				;cargamos en a la posición del primer elemento del array de entidades, el player	
+			;ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
+			;ld a, e_y(iy)				;|
+			;ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
+			ld e_ai_patrol_step(ix), #0
+			ld e_ai_pre_st(ix), #e_ai_st_stand_by
+			ld e_ai_st(ix), #e_ai_st_patrol	;nuevo estado de la entidad, move_to
 ret
 
 sys_ai_move_to:
@@ -62,10 +63,13 @@ sys_ai_move_to:
 
 		ld a, e_vx(ix)			;velociad de x
 		or a					;comparar con cero
-		jr nz, _endif_y			;si no es cero seguimos con el bucle
-			ld e_ai_st(ix), #e_ai_st_stand_by ;si es cero (las dos son cero), cambiamos el status de la entidad a stand by
+		jr nz, _endif_y	
+				;si no es cero seguimos con el bucle
+		ld a, e_ai_pre_st(ix)
+		ld e_ai_st(ix), a ;si es cero (las dos son cero), cambiamos el status de la entidad a stand by
+		ld e_ai_pre_st(ix), #e_ai_st_move_to
 
-	_endif_y:
+		_endif_y:
 
 ret
 
@@ -87,6 +91,8 @@ sys_ai_control_update::
 			call z, sys_ai_stand_by	;vamos a la rutina de standby
 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
 			call z, sys_ai_move_to
+			cp #e_ai_st_patrol	;comparamos la variable e_ai_st(status) con la constante de moveto
+			call z, sys_ai_patrol
 
 		_no_AI_ent:
 
@@ -95,4 +101,26 @@ sys_ai_control_update::
 
 			jr _loop
 
-;ret
+sys_ai_patrol::
+	ld a, e_ai_patrol_step(ix)
+	cp #0
+	jr z, _step0
+	cp #1
+	jr z, _step1
+
+	_step0:
+	ld e_ai_aim_X(ix), #6
+	ld e_ai_aim_y(ix), #6
+	ld e_ai_pre_st(ix), #e_ai_st_patrol
+	ld e_ai_st(ix), #e_ai_st_move_to
+	ld e_ai_patrol_step(ix), #1
+	ret
+
+	_step1:
+	ld e_ai_aim_X(ix), #32
+	ld e_ai_aim_y(ix), #40
+	ld e_ai_pre_st(ix), #e_ai_st_patrol
+	ld e_ai_st(ix), #e_ai_st_move_to
+	ld e_ai_patrol_step(ix), #0
+	ret
+

@@ -6,15 +6,16 @@ Symbol Table
     .__.$$$.=  2710 L   |     .__.ABS.=  0000 G   |     .__.CPU.=  0000 L
     .__.H$L.=  0000 L   |     _pal_mai   **** GX  |     _sp_main   **** GX
     _sp_redb   **** GX  |     _sp_swor   **** GX  |     e_ai_aim=  0008 
-    e_ai_aim=  0009     |     e_ai_st =  000A     |     e_ai_st_=  0002 
-    e_ai_st_=  0000     |     e_ai_st_=  0001     |     e_h     =  0005 
-    e_lastVP=  000C     |     e_lastVP=  000B     |     e_pspr_h=  0007 
+    e_ai_aim=  0009     |     e_ai_pat=  000C     |     e_ai_pre=  000B 
+    e_ai_st =  000A     |     e_ai_st_=  0002     |     e_ai_st_=  0000 
+    e_ai_st_=  0003     |     e_ai_st_=  0001     |     e_h     =  0005 
+    e_lastVP=  000E     |     e_lastVP=  000D     |     e_pspr_h=  0007 
     e_pspr_l=  0006     |     e_vx    =  0002     |     e_vy    =  0003 
     e_w     =  0004     |     e_x     =  0000     |     e_y     =  0001 
     man_enti   **** GX  |     man_enti   **** GX  |     man_enti   **** GX
-    man_enti   **** GX  |   0 man_game   0027 GR  |   0 man_game   0056 GR
-  0 man_game   004C GR  |   0 player     0000 R   |   0 redball    000D R
-    sizeof_e=  000D     |   0 sword      001A R   |     sys_ai_c   **** GX
+    man_enti   **** GX  |   0 man_game   002D GR  |   0 man_game   005C GR
+  0 man_game   0052 GR  |   0 player     0000 R   |   0 redball    000F R
+    sizeof_e=  000F     |   0 sword      001E R   |     sys_ai_c   **** GX
     sys_ai_c   **** GX  |     sys_eren   **** GX  |     sys_eren   **** GX
     sys_inpu   **** GX  |     sys_inpu   **** GX  |     sys_phys   **** GX
     sys_pysi   **** GX
@@ -24,5 +25,5 @@ Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   5A   flags    0
+   0 _CODE      size   60   flags    0
 

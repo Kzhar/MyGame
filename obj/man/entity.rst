@@ -26,39 +26,44 @@ Hexadecimal [16-Bits]
                               6 	.db _w, _h		;tamaño
                               7 	.dw _pspr		;puntero a sprite
                               8 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-                              9 	.db _AIstatus		
-                             10 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-                             11 .endm
-                             12 
-                             13 
-                             14 .macro DefineCmp_Entity_default
-                             15 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-                             16 .endm
-                             17 
-                             18 ;;Definición de constantes: offsets de cada entidad para usar con ix
+                              9 	.db _AIstatus	;AI status
+                             10 	.db _AIstatus	;Previous AI status
+                             11 	.db 0x00		;Step, contador de waypoints
+                             12 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+                             13 .endm
+                             14 
+                             15 
+                             16 .macro DefineCmp_Entity_default
+                             17 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+                             18 .endm
                              19 
-                             20 
-                     0000    21 e_x = 0		;posición x
-                     0001    22 e_y = 1		;posición y
-                     0002    23 e_vx = 2 		;velocidad en x
-                     0003    24 e_vy = 3		;velocidad en y
-                     0004    25 e_w = 4		;anchura del sprite en bytes
-                     0005    26 e_h = 5		;altura del sprite en bytes
-                     0006    27 e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
-                     0007    28 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     0008    29 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     0009    30 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     000A    31 e_ai_st = 10
-                     000B    32 e_lastVP_l = 11	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     000C    33 e_lastVP_h = 12	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
-                     000D    34 sizeof_e = 13	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
-                             35 	
-                             36 ;;Creamos una enumeración de status de ia
-                             37 
-                     0000    38 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
-                     0001    39 e_ai_st_stand_by = 1	;stand by
-                     0002    40 e_ai_st_move_to = 2
+                             20 ;;Definición de constantes: offsets de cada entidad para usar con ix
+                             21 
+                             22 
+                     0000    23 e_x = 0		;posición x
+                     0001    24 e_y = 1		;posición y
+                     0002    25 e_vx = 2 		;velocidad en x
+                     0003    26 e_vy = 3		;velocidad en y
+                     0004    27 e_w = 4		;anchura del sprite en bytes
+                     0005    28 e_h = 5		;altura del sprite en bytes
+                     0006    29 e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
+                     0007    30 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     0008    31 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
+                     0009    32 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
+                     000A    33 e_ai_st = 10
+                     000B    34 e_ai_pre_st = 11
+                     000C    35 e_ai_patrol_step = 12
+                     000D    36 e_lastVP_l = 13	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     000E    37 e_lastVP_h = 14	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
+                     000F    38 sizeof_e = 15	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
+                             39 	
+                             40 ;;Creamos una enumeración de status de ia
                              41 
+                     0000    42 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
+                     0001    43 e_ai_st_stand_by = 1	;stand by
+                     0002    44 e_ai_st_move_to = 2
+                     0003    45 e_ai_st_patrol = 3
+                             46 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 4.
 Hexadecimal [16-Bits]
 
@@ -2615,111 +2620,120 @@ Hexadecimal [16-Bits]
    4084 01 01                 3 	.db 1, 1		;tamaño
    4086 00 00                 4 	.dw 0x0000		;puntero a sprite
    4088 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   408A 00                    6 	.db e_ai_st_noAI		
-   408B CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   0010                       1 		DefineCmp_Entity_default
-   0010                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-   408D 00 00                 1 	.db 0, 0		;posición
-   408F 00 00                 2 	.db 0, 0	;velocidad
-   4091 01 01                 3 	.db 1, 1		;tamaño
-   4093 00 00                 4 	.dw 0x0000		;puntero a sprite
-   4095 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   4097 00                    6 	.db e_ai_st_noAI		
-   4098 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   001D                       1 		DefineCmp_Entity_default
-   001D                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-   409A 00 00                 1 	.db 0, 0		;posición
-   409C 00 00                 2 	.db 0, 0	;velocidad
-   409E 01 01                 3 	.db 1, 1		;tamaño
-   40A0 00 00                 4 	.dw 0x0000		;puntero a sprite
-   40A2 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   40A4 00                    6 	.db e_ai_st_noAI		
-   40A5 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   002A                       1 		DefineCmp_Entity_default
-   002A                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-   40A7 00 00                 1 	.db 0, 0		;posición
-   40A9 00 00                 2 	.db 0, 0	;velocidad
-   40AB 01 01                 3 	.db 1, 1		;tamaño
-   40AD 00 00                 4 	.dw 0x0000		;puntero a sprite
-   40AF 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   40B1 00                    6 	.db e_ai_st_noAI		
-   40B2 CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   0037                       1 		DefineCmp_Entity_default
-   0037                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-   40B4 00 00                 1 	.db 0, 0		;posición
+   408A 00                    6 	.db e_ai_st_noAI	;AI status
+   408B 00                    7 	.db e_ai_st_noAI	;Previous AI status
+   408C 00                    8 	.db 0x00		;Step, contador de waypoints
+   408D CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   0012                       1 		DefineCmp_Entity_default
+   0012                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+   408F 00 00                 1 	.db 0, 0		;posición
+   4091 00 00                 2 	.db 0, 0	;velocidad
+   4093 01 01                 3 	.db 1, 1		;tamaño
+   4095 00 00                 4 	.dw 0x0000		;puntero a sprite
+   4097 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
+   4099 00                    6 	.db e_ai_st_noAI	;AI status
+   409A 00                    7 	.db e_ai_st_noAI	;Previous AI status
+   409B 00                    8 	.db 0x00		;Step, contador de waypoints
+   409C CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   0021                       1 		DefineCmp_Entity_default
+   0021                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+   409E 00 00                 1 	.db 0, 0		;posición
+   40A0 00 00                 2 	.db 0, 0	;velocidad
+   40A2 01 01                 3 	.db 1, 1		;tamaño
+   40A4 00 00                 4 	.dw 0x0000		;puntero a sprite
+   40A6 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
+   40A8 00                    6 	.db e_ai_st_noAI	;AI status
+   40A9 00                    7 	.db e_ai_st_noAI	;Previous AI status
+   40AA 00                    8 	.db 0x00		;Step, contador de waypoints
+   40AB CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   0030                       1 		DefineCmp_Entity_default
+   0030                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+   40AD 00 00                 1 	.db 0, 0		;posición
+   40AF 00 00                 2 	.db 0, 0	;velocidad
+   40B1 01 01                 3 	.db 1, 1		;tamaño
+   40B3 00 00                 4 	.dw 0x0000		;puntero a sprite
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 54.
 Hexadecimal [16-Bits]
 
 
 
-   40B6 00 00                 2 	.db 0, 0	;velocidad
-   40B8 01 01                 3 	.db 1, 1		;tamaño
-   40BA 00 00                 4 	.dw 0x0000		;puntero a sprite
-   40BC 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   40BE 00                    6 	.db e_ai_st_noAI		
-   40BF CC CC                 7 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   40C1 DE AD 00 00 00        7 	.db #0xDE, #0xAD, #0x00, #0x00, #0x00			;se crean tres nuevos bytes al final del array de forma provisional 
+   40B5 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
+   40B7 00                    6 	.db e_ai_st_noAI	;AI status
+   40B8 00                    7 	.db e_ai_st_noAI	;Previous AI status
+   40B9 00                    8 	.db 0x00		;Step, contador de waypoints
+   40BA CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   003F                       1 		DefineCmp_Entity_default
+   003F                       1 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+   40BC 00 00                 1 	.db 0, 0		;posición
+   40BE 00 00                 2 	.db 0, 0	;velocidad
+   40C0 01 01                 3 	.db 1, 1		;tamaño
+   40C2 00 00                 4 	.dw 0x0000		;puntero a sprite
+   40C4 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
+   40C6 00                    6 	.db e_ai_st_noAI	;AI status
+   40C7 00                    7 	.db e_ai_st_noAI	;Previous AI status
+   40C8 00                    8 	.db 0x00		;Step, contador de waypoints
+   40C9 CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   40CB DE AD 00 00 00        7 	.db #0xDE, #0xAD, #0x00, #0x00, #0x00			;se crean tres nuevos bytes al final del array de forma provisional 
                              16 
                              17 ;Para trabajar con entidades se necesita poner el puntero ix en el comienzo del array de entidades
                              18 ;RETURN a número de entidades
-   40C6                      19 man_entity_getArray::
-   40C6 DD 21 80 40   [14]   20 	ld ix, #_entity_array
-   40CA 3A 7D 40      [13]   21 	ld a, (_entity_num)
-   40CD C9            [10]   22 ret
-                             23 
-                             24 ;se resetea el número de entidades a cero y se situa al principio del array el puntero _entity_pend
-                             25 ;puntero que señala al byte donde se debe crear la nueva entidad (en este caso al principio) 
-   40CE                      26 man_entity_init::
-   40CE AF            [ 4]   27 	xor a				;a=0
-   40CF 32 7D 40      [13]   28 	ld (_entity_num), a	;iniciamos el número de unidades creadas a cero
-                             29 
-   40D2 21 80 40      [10]   30 	ld hl, #_entity_array	;hl apunta a la primera posición del array de entidades
-   40D5 22 7E 40      [16]   31 	ld (_entity_pend), hl	;posición donde se creará la siguiente entidad => primera posición del array
-                             32 
-   40D8 C9            [10]   33 ret
+   40D0                      19 man_entity_getArray::
+   40D0 DD 21 80 40   [14]   20 	ld ix, #_entity_array
+   40D4 C9            [10]   21 ret
+                             22 
+                             23 ;se resetea el número de entidades a cero y se situa al principio del array el puntero _entity_pend
+                             24 ;puntero que señala al byte donde se debe crear la nueva entidad (en este caso al principio) 
+   40D5                      25 man_entity_init::
+   40D5 AF            [ 4]   26 	xor a				;a=0
+   40D6 32 7D 40      [13]   27 	ld (_entity_num), a	;iniciamos el número de unidades creadas a cero
+                             28 
+   40D9 21 80 40      [10]   29 	ld hl, #_entity_array	;hl apunta a la primera posición del array de entidades
+   40DC 22 7E 40      [16]   30 	ld (_entity_pend), hl	;posición donde se creará la siguiente entidad => primera posición del array
+                             31 
+   40DF C9            [10]   32 ret
+                             33 
                              34 
-                             35 
-                             36 ;INPUT HL => PUNTERO A VALORES DE INICIALIZACIÓN DE LA ENTIDAD A CREAR
-                             37 ;RETURN ix => PUNTERO A LA ENTIDAD CREADA
-   40D9                      38 man_entity_create::
-   40D9 E5            [11]   39 	push hl			;man_entity_new destruye hl
-   40DA CD E5 40      [17]   40 	call man_entity_new
-                             41 
-   0060                      42 	ld__ixh_d
-   40DD DD 62                 1    .dw #0x62DD  ;; Opcode for ld ixh, d
-   0062                      43 	ld__ixl_e	;instrucciones no comentadas de CPC (macro de cpctelera) ix = de puntero a la entidad añadida
-   40DF DD 6B                 1    .dw #0x6BDD  ;; Opcode for ld ixl, e
-                             44 
-   40E1 E1            [10]   45 	pop hl
-   40E2 ED B0         [21]   46 	ldir		;copia array hl en array de (tamaño del array bc)
-                             47 
-   40E4 C9            [10]   48 ret
-                             49 
-                             50 ;se añade uno al contador de unidades y se mueve _entity_pend a la posición para crear la siguiente entidad
-                             51 ;Devueleve los siguientes valores para el ldir
-                             52 ;RETURN  	DE= PUNTERO AL NUEVO ELEMENTO A AÑADIR (AÑADIDO PERO SIN DATOS?)
-                             53 ;		BC= TAMAÑO DE LA ENTIDAD PARA HACER EL LDIR sizeof_e		
-   40E5                      54 man_entity_new::
-   40E5 21 7D 40      [10]   55 	ld hl, #_entity_num
-   40E8 34            [11]   56 	inc (hl)			;+1 ENTIDAD NUEVA CREADA
-                             57 
-   40E9 2A 7E 40      [16]   58 	ld hl,(_entity_pend)	;PUNTERO A LA DIRECCIÓN DE MEMORIA DONDE SE CREARÁ LA UNIDAD
-                             59 
-   40EC 54            [ 4]   60 	ld d, h
-   40ED 5D            [ 4]   61 	ld e, l
+                             35 ;INPUT HL => PUNTERO A VALORES DE INICIALIZACIÓN DE LA ENTIDAD A CREAR
+                             36 ;RETURN ix => PUNTERO A LA ENTIDAD CREADA
+   40E0                      37 man_entity_create::
+   40E0 E5            [11]   38 	push hl			;man_entity_new destruye hl
+   40E1 CD EC 40      [17]   39 	call man_entity_new
+                             40 
+   0067                      41 	ld__ixh_d
+   40E4 DD 62                 1    .dw #0x62DD  ;; Opcode for ld ixh, d
+   0069                      42 	ld__ixl_e	;instrucciones no comentadas de CPC (macro de cpctelera) ix = de puntero a la entidad añadida
+   40E6 DD 6B                 1    .dw #0x6BDD  ;; Opcode for ld ixl, e
+                             43 
+   40E8 E1            [10]   44 	pop hl
+   40E9 ED B0         [21]   45 	ldir		;copia array hl en array de (tamaño del array bc)
+                             46 
+   40EB C9            [10]   47 ret
+                             48 
+                             49 ;se añade uno al contador de unidades y se mueve _entity_pend a la posición para crear la siguiente entidad
+                             50 ;Devueleve los siguientes valores para el ldir
+                             51 ;RETURN  	DE= PUNTERO AL NUEVO ELEMENTO A AÑADIR (AÑADIDO PERO SIN DATOS?)
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 55.
 Hexadecimal [16-Bits]
 
 
 
-   40EE 01 0D 00      [10]   62 	ld bc, #sizeof_e
-   40F1 09            [11]   63 	add hl, bc
-   40F2 22 7E 40      [16]   64 	ld (_entity_pend), hl	;AHORA EL PUNTERO PARA LA CREAR LA SIGUIENTE UNIDAD SE MUEVE EL TAMAÑO DE UNA ENTIDAD EN EL ARRAY
-                             65 	
-   40F5 23            [ 6]   66 	inc hl
-   40F6 23            [ 6]   67 	inc hl
-   40F7 23            [ 6]   68 	inc hl
-   40F8 23            [ 6]   69 	inc hl
-   40F9 36 00         [10]   70 	ld (hl), #0x00			;se rellena con 0 la teórica posición ew_x de la siguiente entidad, lo que significa que la entidad es no valida
-                             71 
-   40FB C9            [10]   72 ret
+                             52 ;		BC= TAMAÑO DE LA ENTIDAD PARA HACER EL LDIR sizeof_e		
+   40EC                      53 man_entity_new::
+   40EC 21 7D 40      [10]   54 	ld hl, #_entity_num
+   40EF 34            [11]   55 	inc (hl)			;+1 ENTIDAD NUEVA CREADA
+                             56 
+   40F0 2A 7E 40      [16]   57 	ld hl,(_entity_pend)	;PUNTERO A LA DIRECCIÓN DE MEMORIA DONDE SE CREARÁ LA UNIDAD
+                             58 
+   40F3 54            [ 4]   59 	ld d, h
+   40F4 5D            [ 4]   60 	ld e, l
+   40F5 01 0F 00      [10]   61 	ld bc, #sizeof_e
+   40F8 09            [11]   62 	add hl, bc
+   40F9 22 7E 40      [16]   63 	ld (_entity_pend), hl	;AHORA EL PUNTERO PARA LA CREAR LA SIGUIENTE UNIDAD SE MUEVE EL TAMAÑO DE UNA ENTIDAD EN EL ARRAY
+                             64 	
+   40FC 23            [ 6]   65 	inc hl
+   40FD 23            [ 6]   66 	inc hl
+   40FE 23            [ 6]   67 	inc hl
+   40FF 23            [ 6]   68 	inc hl
+   4100 36 00         [10]   69 	ld (hl), #0x00			;se rellena con 0 la teórica posición ew_x de la siguiente entidad, lo que significa que la entidad es no valida
+                             70 
+   4102 C9            [10]   71 ret

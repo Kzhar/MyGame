@@ -67,13 +67,14 @@ Symbol Table
     cpct_pag=  0010     |     cpct_pag=  0020     |     cpct_pag=  0030 
     cpct_sca   **** GX  |     cpct_set   **** GX  |     cpct_set   **** GX
     cpct_wai   **** GX  |     e_ai_aim=  0008     |     e_ai_aim=  0009 
-    e_ai_st =  000A     |     e_ai_st_=  0002     |     e_ai_st_=  0000 
-    e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000C 
-    e_lastVP=  000B     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
+    e_ai_pat=  000C     |     e_ai_pre=  000B     |     e_ai_st =  000A 
+    e_ai_st_=  0002     |     e_ai_st_=  0000     |     e_ai_st_=  0003 
+    e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000E 
+    e_lastVP=  000D     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
     e_vx    =  0002     |     e_vy    =  0003     |     e_w     =  0004 
     e_x     =  0000     |     e_y     =  0001     |     opc_DI  =  00F3 
     opc_EI  =  00FB     |     opc_JR  =  0018     |     opc_LD_D=  0016 
-    sizeof_e=  000D     |   0 spc_NotP   0054 R   |   0 spc_pres   0050 R
+    sizeof_e=  000F     |   0 spc_NotP   0054 R   |   0 spc_pres   0050 R
   0 sys_inpu   0000 GR  |   0 sys_inpu   0005 GR
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.

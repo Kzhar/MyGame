@@ -12,39 +12,44 @@ Hexadecimal [16-Bits]
                               6 	.db _w, _h		;tamaño
                               7 	.dw _pspr		;puntero a sprite
                               8 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-                              9 	.db _AIstatus		
-                             10 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-                             11 .endm
-                             12 
-                             13 
-                             14 .macro DefineCmp_Entity_default
-                             15 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-                             16 .endm
-                             17 
-                             18 ;;Definición de constantes: offsets de cada entidad para usar con ix
+                              9 	.db _AIstatus	;AI status
+                             10 	.db _AIstatus	;Previous AI status
+                             11 	.db 0x00		;Step, contador de waypoints
+                             12 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+                             13 .endm
+                             14 
+                             15 
+                             16 .macro DefineCmp_Entity_default
+                             17 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+                             18 .endm
                              19 
-                             20 
-                     0000    21 e_x = 0		;posición x
-                     0001    22 e_y = 1		;posición y
-                     0002    23 e_vx = 2 		;velocidad en x
-                     0003    24 e_vy = 3		;velocidad en y
-                     0004    25 e_w = 4		;anchura del sprite en bytes
-                     0005    26 e_h = 5		;altura del sprite en bytes
-                     0006    27 e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
-                     0007    28 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     0008    29 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     0009    30 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     000A    31 e_ai_st = 10
-                     000B    32 e_lastVP_l = 11	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     000C    33 e_lastVP_h = 12	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
-                     000D    34 sizeof_e = 13	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
-                             35 	
-                             36 ;;Creamos una enumeración de status de ia
-                             37 
-                     0000    38 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
-                     0001    39 e_ai_st_stand_by = 1	;stand by
-                     0002    40 e_ai_st_move_to = 2
+                             20 ;;Definición de constantes: offsets de cada entidad para usar con ix
+                             21 
+                             22 
+                     0000    23 e_x = 0		;posición x
+                     0001    24 e_y = 1		;posición y
+                     0002    25 e_vx = 2 		;velocidad en x
+                     0003    26 e_vy = 3		;velocidad en y
+                     0004    27 e_w = 4		;anchura del sprite en bytes
+                     0005    28 e_h = 5		;altura del sprite en bytes
+                     0006    29 e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
+                     0007    30 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     0008    31 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
+                     0009    32 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
+                     000A    33 e_ai_st = 10
+                     000B    34 e_ai_pre_st = 11
+                     000C    35 e_ai_patrol_step = 12
+                     000D    36 e_lastVP_l = 13	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     000E    37 e_lastVP_h = 14	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
+                     000F    38 sizeof_e = 15	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
+                             39 	
+                             40 ;;Creamos una enumeración de status de ia
                              41 
+                     0000    42 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
+                     0001    43 e_ai_st_stand_by = 1	;stand by
+                     0002    44 e_ai_st_move_to = 2
+                     0003    45 e_ai_st_patrol = 3
+                             46 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
@@ -55,7 +60,7 @@ Hexadecimal [16-Bits]
                               4 
    0000                       5 sys_ai_control_init::
    0000 DD 22 0B 00   [20]    6 	ld (_ent_array_prt_tmp_standby), ix
-   0004 DD 22 64 00   [20]    7 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
+   0004 DD 22 66 00   [20]    7 	ld (_ent_array_ptr), ix 	;me pasan en el init una sola vez el puntero al array y mediante código automodificable, inserto ese valor en el update
    0008 C9            [10]    8 ret
                               9 
                              10 ;RUTINAS INTERNAS
@@ -67,88 +72,121 @@ Hexadecimal [16-Bits]
    0011 C8            [11]   16 			ret z
                              17 
                              18 			;PRESSED KEY, MOVER PLACEHOLDER
-   0012 FD 7E 00      [19]   19 			ld a, e_x(iy)				;cargamos en a la posición del primer elemento del array de entidades, el player	
-   0015 DD 77 08      [19]   20 			ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
-   0018 FD 7E 01      [19]   21 			ld a, e_y(iy)				;|
-   001B DD 77 09      [19]   22 			ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
-                             23 
-   001E DD 36 0A 02   [19]   24 			ld e_ai_st(ix), #e_ai_st_move_to	;nuevo estado de la entidad, move_to
-   0022 C9            [10]   25 ret
-                             26 
-   0023                      27 sys_ai_move_to:
-                             28 ;COMPROBAR X ********************
-   0023 DD 7E 08      [19]   29 	ld a, e_ai_aim_X(ix)			;a = objX
-   0026 DD 96 00      [19]   30 	sub e_x(ix)					;a = objX - x
-   0029 30 06         [12]   31 	jr nc, _objx_greater_or_equal		;objX - x > 0 (objX > x)
-                             32 
-   002B                      33 	_objx_lesser:
-   002B DD 36 02 FF   [19]   34 		ld e_vx(ix), #-1			;move to the left
-   002F 18 0C         [12]   35 		jr _endif_x
-                             36 
-   0031                      37 	_objx_greater_or_equal:
-   0031 28 06         [12]   38 		jr z, _arrived_x			;si es cero ya ha llegado al objetivo
-   0033 DD 36 02 01   [19]   39 		ld e_vx(ix), #1			;move to the right
-   0037 18 04         [12]   40 		jr _endif_x
-                             41 
-   0039                      42 	_arrived_x:
-   0039 DD 36 02 00   [19]   43 		ld e_vx(ix), #0			;x velociti = 0
-                             44 
-   003D                      45 	_endif_x:
-                             46 ;COMPROBAR Y *********************
-   003D DD 7E 09      [19]   47 	ld a, e_ai_aim_y(ix)			;a = objX
-   0040 DD 96 01      [19]   48 	sub e_y(ix)					;a = objX - x
-   0043 30 06         [12]   49 	jr nc, _objy_greater_or_equal		;objX - x > 0 (objX > x)
-                             50 
-   0045                      51 	_objy_lesser:
-   0045 DD 36 03 FE   [19]   52 		ld e_vy(ix), #-2			
-   0049 18 16         [12]   53 		jr _endif_y
-                             54 
-   004B                      55 	_objy_greater_or_equal:
-   004B 28 06         [12]   56 		jr z, _arrived_y			;si es cero ya ha llegado al objetivo
+                             19 			;ld a, e_x(iy)				;cargamos en a la posición del primer elemento del array de entidades, el player	
+                             20 			;ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
+                             21 			;ld a, e_y(iy)				;|
+                             22 			;ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
+   0012 DD 36 0C 00   [19]   23 			ld e_ai_patrol_step(ix), #0
+   0016 DD 36 0B 01   [19]   24 			ld e_ai_pre_st(ix), #e_ai_st_stand_by
+   001A DD 36 0A 03   [19]   25 			ld e_ai_st(ix), #e_ai_st_patrol	;nuevo estado de la entidad, move_to
+   001E C9            [10]   26 ret
+                             27 
+   001F                      28 sys_ai_move_to:
+                             29 ;COMPROBAR X ********************
+   001F DD 7E 08      [19]   30 	ld a, e_ai_aim_X(ix)			;a = objX
+   0022 DD 96 00      [19]   31 	sub e_x(ix)					;a = objX - x
+   0025 30 06         [12]   32 	jr nc, _objx_greater_or_equal		;objX - x > 0 (objX > x)
+                             33 
+   0027                      34 	_objx_lesser:
+   0027 DD 36 02 FF   [19]   35 		ld e_vx(ix), #-1			;move to the left
+   002B 18 0C         [12]   36 		jr _endif_x
+                             37 
+   002D                      38 	_objx_greater_or_equal:
+   002D 28 06         [12]   39 		jr z, _arrived_x			;si es cero ya ha llegado al objetivo
+   002F DD 36 02 01   [19]   40 		ld e_vx(ix), #1			;move to the right
+   0033 18 04         [12]   41 		jr _endif_x
+                             42 
+   0035                      43 	_arrived_x:
+   0035 DD 36 02 00   [19]   44 		ld e_vx(ix), #0			;x velociti = 0
+                             45 
+   0039                      46 	_endif_x:
+                             47 ;COMPROBAR Y *********************
+   0039 DD 7E 09      [19]   48 	ld a, e_ai_aim_y(ix)			;a = objX
+   003C DD 96 01      [19]   49 	sub e_y(ix)					;a = objX - x
+   003F 30 06         [12]   50 	jr nc, _objy_greater_or_equal		;objX - x > 0 (objX > x)
+                             51 
+   0041                      52 	_objy_lesser:
+   0041 DD 36 03 FE   [19]   53 		ld e_vy(ix), #-2			
+   0045 18 1C         [12]   54 		jr _endif_y
+                             55 
+   0047                      56 	_objy_greater_or_equal:
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
 Hexadecimal [16-Bits]
 
 
 
-   004D DD 36 03 02   [19]   57 		ld e_vy(ix), #2			
-   0051 18 0E         [12]   58 		jr _endif_y
-                             59 
-   0053                      60 	_arrived_y:
-   0053 DD 36 03 00   [19]   61 		ld e_vy(ix), #0			;x velociti = 0
-                             62 
-   0057 DD 7E 02      [19]   63 		ld a, e_vx(ix)			;velociad de x
-   005A B7            [ 4]   64 		or a					;comparar con cero
-   005B 20 04         [12]   65 		jr nz, _endif_y			;si no es cero seguimos con el bucle
-   005D DD 36 0A 01   [19]   66 			ld e_ai_st(ix), #e_ai_st_stand_by ;si es cero (las dos son cero), cambiamos el status de la entidad a stand by
-                             67 
-   0061                      68 	_endif_y:
-                             69 
-   0061 C9            [10]   70 ret
+   0047 28 06         [12]   57 		jr z, _arrived_y			;si es cero ya ha llegado al objetivo
+   0049 DD 36 03 02   [19]   58 		ld e_vy(ix), #2			
+   004D 18 14         [12]   59 		jr _endif_y
+                             60 
+   004F                      61 	_arrived_y:
+   004F DD 36 03 00   [19]   62 		ld e_vy(ix), #0			;x velociti = 0
+                             63 
+   0053 DD 7E 02      [19]   64 		ld a, e_vx(ix)			;velociad de x
+   0056 B7            [ 4]   65 		or a					;comparar con cero
+   0057 20 0A         [12]   66 		jr nz, _endif_y	
+                             67 				;si no es cero seguimos con el bucle
+   0059 DD 7E 0B      [19]   68 		ld a, e_ai_pre_st(ix)
+   005C DD 77 0A      [19]   69 		ld e_ai_st(ix), a ;si es cero (las dos son cero), cambiamos el status de la entidad a stand by
+   005F DD 36 0B 02   [19]   70 		ld e_ai_pre_st(ix), #e_ai_st_move_to
                              71 
-   0062                      72 sys_ai_control_update::
-                     0064    73 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
-   0062 DD 21 00 00   [14]   74 	ld ix, #0x0000			;desde init se utiliza código automodificable para cargar en ix la posición constante del puntero al array de entidades
+   0063                      72 		_endif_y:
+                             73 
+   0063 C9            [10]   74 ret
                              75 
-   0066                      76 	_loop:
-   0066 DD 7E 04      [19]   77 		ld a, e_w(ix)		;|
-   0069 B7            [ 4]   78 		or a				;|
-   006A C8            [11]   79 		ret z				;|sw comprueva si la entidad es válida e_w(ix)!=0
-                             80 
-   006B DD 7E 0A      [19]   81 		ld a, e_ai_st(ix)		;status de ia
-   006E FE 00         [ 7]   82 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
-   0070 28 0A         [12]   83 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
+   0064                      76 sys_ai_control_update::
+                     0066    77 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
+   0064 DD 21 00 00   [14]   78 	ld ix, #0x0000			;desde init se utiliza código automodificable para cargar en ix la posición constante del puntero al array de entidades
+                             79 
+   0068                      80 	_loop:
+   0068 DD 7E 04      [19]   81 		ld a, e_w(ix)		;|
+   006B B7            [ 4]   82 		or a				;|
+   006C C8            [11]   83 		ret z				;|sw comprueva si la entidad es válida e_w(ix)!=0
                              84 
-   0072                      85 		_AIent:
-   0072 FE 01         [ 7]   86 			cp #e_ai_st_stand_by	;comparamos la variable e_ai_st(status) con la constante de standby
-   0074 CC 09 00      [17]   87 			call z, sys_ai_stand_by	;vamos a la rutina de standby
-   0077 FE 02         [ 7]   88 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
-   0079 CC 23 00      [17]   89 			call z, sys_ai_move_to
-                             90 
-   007C                      91 		_no_AI_ent:
-                             92 
-   007C 11 0D 00      [10]   93 			ld de, #sizeof_e		;|
-   007F DD 19         [15]   94 			add ix, de			;|se pasa a la siguiente entidad
-                             95 
-   0081 18 E3         [12]   96 			jr _loop
-                             97 
-                             98 ;ret
+   006D DD 7E 0A      [19]   85 		ld a, e_ai_st(ix)		;status de ia
+   0070 FE 00         [ 7]   86 		cp #e_ai_st_noAI		;comparamos con la constante correspondiente a entidad sin ia (0)
+   0072 28 0F         [12]   87 		jr z, _no_AI_ent		;si no tiene AI simplemente pasamos a la siguiente entidad
+                             88 
+   0074                      89 		_AIent:
+   0074 FE 01         [ 7]   90 			cp #e_ai_st_stand_by	;comparamos la variable e_ai_st(status) con la constante de standby
+   0076 CC 09 00      [17]   91 			call z, sys_ai_stand_by	;vamos a la rutina de standby
+   0079 FE 02         [ 7]   92 			cp #e_ai_st_move_to	;comparamos la variable e_ai_st(status) con la constante de moveto
+   007B CC 1F 00      [17]   93 			call z, sys_ai_move_to
+   007E FE 03         [ 7]   94 			cp #e_ai_st_patrol	;comparamos la variable e_ai_st(status) con la constante de moveto
+   0080 CC 8A 00      [17]   95 			call z, sys_ai_patrol
+                             96 
+   0083                      97 		_no_AI_ent:
+                             98 
+   0083 11 0F 00      [10]   99 			ld de, #sizeof_e		;|
+   0086 DD 19         [15]  100 			add ix, de			;|se pasa a la siguiente entidad
+                            101 
+   0088 18 DE         [12]  102 			jr _loop
+                            103 
+   008A                     104 sys_ai_patrol::
+   008A DD 7E 0C      [19]  105 	ld a, e_ai_patrol_step(ix)
+   008D FE 00         [ 7]  106 	cp #0
+   008F 28 04         [12]  107 	jr z, _step0
+   0091 FE 01         [ 7]  108 	cp #1
+   0093 28 15         [12]  109 	jr z, _step1
+                            110 
+   0095                     111 	_step0:
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 4.
+Hexadecimal [16-Bits]
+
+
+
+   0095 DD 36 08 06   [19]  112 	ld e_ai_aim_X(ix), #6
+   0099 DD 36 09 06   [19]  113 	ld e_ai_aim_y(ix), #6
+   009D DD 36 0B 03   [19]  114 	ld e_ai_pre_st(ix), #e_ai_st_patrol
+   00A1 DD 36 0A 02   [19]  115 	ld e_ai_st(ix), #e_ai_st_move_to
+   00A5 DD 36 0C 01   [19]  116 	ld e_ai_patrol_step(ix), #1
+   00A9 C9            [10]  117 	ret
+                            118 
+   00AA                     119 	_step1:
+   00AA DD 36 08 20   [19]  120 	ld e_ai_aim_X(ix), #32
+   00AE DD 36 09 28   [19]  121 	ld e_ai_aim_y(ix), #40
+   00B2 DD 36 0B 03   [19]  122 	ld e_ai_pre_st(ix), #e_ai_st_patrol
+   00B6 DD 36 0A 02   [19]  123 	ld e_ai_st(ix), #e_ai_st_move_to
+   00BA DD 36 0C 00   [19]  124 	ld e_ai_patrol_step(ix), #0
+   00BE C9            [10]  125 	ret
+                            126 

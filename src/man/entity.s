@@ -18,7 +18,6 @@ DefineComponentArrayStructure  _entity, max_entities, DefineCmp_Entity_default
 ;RETURN a número de entidades
 man_entity_getArray::
 	ld ix, #_entity_array
-	ld a, (_entity_num)
 ret
 
 ;se resetea el número de entidades a cero y se situa al principio del array el puntero _entity_pend

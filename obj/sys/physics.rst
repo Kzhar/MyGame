@@ -18,39 +18,44 @@ Hexadecimal [16-Bits]
                               6 	.db _w, _h		;tamaño
                               7 	.dw _pspr		;puntero a sprite
                               8 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-                              9 	.db _AIstatus		
-                             10 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-                             11 .endm
-                             12 
-                             13 
-                             14 .macro DefineCmp_Entity_default
-                             15 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
-                             16 .endm
-                             17 
-                             18 ;;Definición de constantes: offsets de cada entidad para usar con ix
+                              9 	.db _AIstatus	;AI status
+                             10 	.db _AIstatus	;Previous AI status
+                             11 	.db 0x00		;Step, contador de waypoints
+                             12 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+                             13 .endm
+                             14 
+                             15 
+                             16 .macro DefineCmp_Entity_default
+                             17 	DefineCmp_Entity 0, 0, 0, 0, 1, 1, 0x0000, e_ai_st_noAI
+                             18 .endm
                              19 
-                             20 
-                     0000    21 e_x = 0		;posición x
-                     0001    22 e_y = 1		;posición y
-                     0002    23 e_vx = 2 		;velocidad en x
-                     0003    24 e_vy = 3		;velocidad en y
-                     0004    25 e_w = 4		;anchura del sprite en bytes
-                     0005    26 e_h = 5		;altura del sprite en bytes
-                     0006    27 e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
-                     0007    28 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     0008    29 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     0009    30 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     000A    31 e_ai_st = 10
-                     000B    32 e_lastVP_l = 11	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     000C    33 e_lastVP_h = 12	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
-                     000D    34 sizeof_e = 13	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
-                             35 	
-                             36 ;;Creamos una enumeración de status de ia
-                             37 
-                     0000    38 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
-                     0001    39 e_ai_st_stand_by = 1	;stand by
-                     0002    40 e_ai_st_move_to = 2
+                             20 ;;Definición de constantes: offsets de cada entidad para usar con ix
+                             21 
+                             22 
+                     0000    23 e_x = 0		;posición x
+                     0001    24 e_y = 1		;posición y
+                     0002    25 e_vx = 2 		;velocidad en x
+                     0003    26 e_vy = 3		;velocidad en y
+                     0004    27 e_w = 4		;anchura del sprite en bytes
+                     0005    28 e_h = 5		;altura del sprite en bytes
+                     0006    29 e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
+                     0007    30 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     0008    31 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
+                     0009    32 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
+                     000A    33 e_ai_st = 10
+                     000B    34 e_ai_pre_st = 11
+                     000C    35 e_ai_patrol_step = 12
+                     000D    36 e_lastVP_l = 13	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     000E    37 e_lastVP_h = 14	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
+                     000F    38 sizeof_e = 15	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
+                             39 	
+                             40 ;;Creamos una enumeración de status de ia
                              41 
+                     0000    42 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
+                     0001    43 e_ai_st_stand_by = 1	;stand by
+                     0002    44 e_ai_st_move_to = 2
+                     0003    45 e_ai_st_patrol = 3
+                             46 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
 Hexadecimal [16-Bits]
 
@@ -85,73 +90,73 @@ Hexadecimal [16-Bits]
                      0050     4 screen_width = 80
                      00C8     5 screen_height = 200
                               6 
-   422E                       7 sys_physics_init::
-   422E DD 22 35 42   [20]    8 	ld (_ent_array_ptr), ix
-   4232 C9            [10]    9 ret
+   4277                       7 sys_physics_init::
+   4277 DD 22 7E 42   [20]    8 	ld (_ent_array_ptr), ix
+   427B C9            [10]    9 ret
                              10 
                              11 ;INPUT: 	IX POINTER TO ENTITY ARRAY
                              12 ;		A NUMBER OF ELEMENTS IN THE ARRAY
-   4233                      13 sys_pysics_update::
+   427C                      13 sys_pysics_update::
                      0007    14 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
-   4233 DD 21 00 00   [14]   15 	ld ix, #0x0000			;
+   427C DD 21 00 00   [14]   15 	ld ix, #0x0000			;
                              16 	;ld b, a	;b number of entities in the array
                              17 
-   4237                      18 _update_loop:
+   4280                      18 _update_loop:
                              19 
-   4237 DD 7E 04      [19]   20 	ld a, e_w(ix)
-   423A B7            [ 4]   21 	or a
-   423B C8            [11]   22 	ret z
+   4280 DD 7E 04      [19]   20 	ld a, e_w(ix)
+   4283 B7            [ 4]   21 	or a
+   4284 C8            [11]   22 	ret z
                              23 
-   423C 3E 51         [ 7]   24 	ld a, #screen_width + 1
-   423E DD 96 04      [19]   25 	sub e_w(ix)
-   4241 4F            [ 4]   26 	ld c, a			;C = posición máxima de la entidad + 1
+   4285 3E 51         [ 7]   24 	ld a, #screen_width + 1
+   4287 DD 96 04      [19]   25 	sub e_w(ix)
+   428A 4F            [ 4]   26 	ld c, a			;C = posición máxima de la entidad + 1
                              27 
-   4242 DD 7E 00      [19]   28 	ld a, e_x(ix)		;A = Posición actual
-   4245 DD 86 02      [19]   29 	add e_vx(ix)		;A = Posición actual + velocidad
-   4248 B9            [ 4]   30 	cp c				;comparar con la posición maxima mas uno (si es la máxima daría cero)
-   4249 30 05         [12]   31 	jr nc, invalid_x
+   428B DD 7E 00      [19]   28 	ld a, e_x(ix)		;A = Posición actual
+   428E DD 86 02      [19]   29 	add e_vx(ix)		;A = Posición actual + velocidad
+   4291 B9            [ 4]   30 	cp c				;comparar con la posición maxima mas uno (si es la máxima daría cero)
+   4292 30 05         [12]   31 	jr nc, invalid_x
                              32 
-   424B                      33 	valid_x:
-   424B DD 77 00      [19]   34 		ld e_x(ix), a	;cargar en e_x la nueva posición
-   424E 18 08         [12]   35 		jr endif_x
+   4294                      33 	valid_x:
+   4294 DD 77 00      [19]   34 		ld e_x(ix), a	;cargar en e_x la nueva posición
+   4297 18 08         [12]   35 		jr endif_x
                              36 
-   4250                      37 	invalid_x:
-   4250 DD 7E 02      [19]   38 		ld a, e_vx(ix)
-   4253 ED 44         [ 8]   39 		neg
-   4255 DD 77 02      [19]   40 		ld e_vx(ix), a		;se invierte la velocidad en x
+   4299                      37 	invalid_x:
+   4299 DD 7E 02      [19]   38 		ld a, e_vx(ix)
+   429C ED 44         [ 8]   39 		neg
+   429E DD 77 02      [19]   40 		ld e_vx(ix), a		;se invierte la velocidad en x
                              41 
-   4258                      42 	endif_x:
+   42A1                      42 	endif_x:
                              43 
-   4258 3E C9         [ 7]   44 	ld a, #screen_height + 1
-   425A DD 96 05      [19]   45 	sub e_h(ix)
-   425D 4F            [ 4]   46 	ld c, a				;C = posición máxima de la entidad + 1
+   42A1 3E C9         [ 7]   44 	ld a, #screen_height + 1
+   42A3 DD 96 05      [19]   45 	sub e_h(ix)
+   42A6 4F            [ 4]   46 	ld c, a				;C = posición máxima de la entidad + 1
                              47 
-   425E DD 7E 01      [19]   48 	ld a, e_y(ix)
-   4261 DD 86 03      [19]   49 	add e_vy(ix)
-   4264 B9            [ 4]   50 	cp c					;comparar con la posición máxima + 1 
-   4265 30 05         [12]   51 	jr nc, invalid_y
+   42A7 DD 7E 01      [19]   48 	ld a, e_y(ix)
+   42AA DD 86 03      [19]   49 	add e_vy(ix)
+   42AD B9            [ 4]   50 	cp c					;comparar con la posición máxima + 1 
+   42AE 30 05         [12]   51 	jr nc, invalid_y
                              52 
-   4267                      53 	valid_y:
-   4267 DD 77 01      [19]   54 		ld e_y(ix), a	;cargar en e_y la nueva posición
-   426A 18 08         [12]   55 		jr endif_y
+   42B0                      53 	valid_y:
+   42B0 DD 77 01      [19]   54 		ld e_y(ix), a	;cargar en e_y la nueva posición
+   42B3 18 08         [12]   55 		jr endif_y
                              56 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 5.
 Hexadecimal [16-Bits]
 
 
 
-   426C                      57 	invalid_y:
-   426C DD 7E 03      [19]   58 		ld a, e_vy(ix)
-   426F ED 44         [ 8]   59 		neg
-   4271 DD 77 03      [19]   60 		ld e_vy(ix), a	;se invierte la velocidad en y
+   42B5                      57 	invalid_y:
+   42B5 DD 7E 03      [19]   58 		ld a, e_vy(ix)
+   42B8 ED 44         [ 8]   59 		neg
+   42BA DD 77 03      [19]   60 		ld e_vy(ix), a	;se invierte la velocidad en y
                              61 
-   4274                      62 	endif_y:
+   42BD                      62 	endif_y:
                              63 
                              64 	;dec b		;numero de entidades en el array
                              65 	;ret z
                              66 
-   4274 11 0D 00      [10]   67 	ld de, #sizeof_e
-   4277 DD 19         [15]   68 	add ix, de			;ix apunta a la siguiente entidad
-   4279 18 BC         [12]   69 	jr _update_loop
+   42BD 11 0F 00      [10]   67 	ld de, #sizeof_e
+   42C0 DD 19         [15]   68 	add ix, de			;ix apunta a la siguiente entidad
+   42C2 18 BC         [12]   69 	jr _update_loop
                              70 
                              71 
