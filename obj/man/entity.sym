@@ -57,25 +57,26 @@ Symbol Table
   0 _entity_   0003 R   |   0 _entity_   0000 R   |   0 _entity_   0001 R
     cpct_pag=  0000     |     cpct_pag=  0010     |     cpct_pag=  0020 
     cpct_pag=  0030     |     e_ai_aim=  0008     |     e_ai_aim=  0009 
-    e_ai_pat=  000C     |     e_ai_pre=  000B     |     e_ai_st =  000A 
+    e_ai_pat=  000D     |     e_ai_pat=  000C     |     e_ai_pre=  000B 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
 Symbol Table
 
-    e_ai_st_=  0002     |     e_ai_st_=  0000     |     e_ai_st_=  0003 
-    e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000E 
-    e_lastVP=  000D     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
-    e_vx    =  0002     |     e_vy    =  0003     |     e_w     =  0004 
-    e_x     =  0000     |     e_y     =  0001     |   0 man_enti   0063 GR
-  0 man_enti   0053 GR  |   0 man_enti   0058 GR  |   0 man_enti   006F GR
-    max_enti=  0005 G   |     opc_DI  =  00F3     |     opc_EI  =  00FB 
-    opc_JR  =  0018     |     opc_LD_D=  0016     |     sizeof_e=  000F 
+    e_ai_st =  000A     |     e_ai_st_=  0002     |     e_ai_st_=  0000 
+    e_ai_st_=  0003     |     e_ai_st_=  0001     |     e_h     =  0005 
+    e_lastVP=  000F     |     e_lastVP=  000E     |     e_pspr_h=  0007 
+    e_pspr_l=  0006     |     e_vx    =  0002     |     e_vy    =  0003 
+    e_w     =  0004     |     e_x     =  0000     |     e_y     =  0001 
+  0 man_enti   0068 GR  |   0 man_enti   0058 GR  |   0 man_enti   005D GR
+  0 man_enti   0074 GR  |     max_enti=  0005 G   |     opc_DI  =  00F3 
+    opc_EI  =  00FB     |     opc_JR  =  0018     |     opc_LD_D=  0016 
+    sizeof_e=  0010 
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
 Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   86   flags    0
+   0 _CODE      size   8B   flags    0
 

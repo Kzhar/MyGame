@@ -1,0 +1,20 @@
+XL2
+H 1 areas 5 global symbols
+S patrol_invalid_move_x DefFFFFFFFF
+S .__.ABS. Def0000
+A _CODE size 10 flags 0 addr 0
+S man_patrol_init Def0000
+S man_patrol_get Def0001
+S patrol_01 Def0005
+T 00 00
+R 00 00 00 00
+T 00 00 C9
+R 00 00 00 00
+T 01 00
+R 00 00 00 00
+T 01 00 21 05 00 C9
+R 00 00 00 00 00 03 00 00
+T 05 00
+R 00 00 00 00
+T 05 00 06 06 3C 28 46 78 02 32 FF 05 00
+R 00 00 00 00 00 0B 00 00

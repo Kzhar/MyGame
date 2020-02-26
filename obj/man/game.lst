@@ -32,7 +32,7 @@ Hexadecimal [16-Bits]
                               8 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
                               9 	.db _AIstatus	;AI status
                              10 	.db _AIstatus	;Previous AI status
-                             11 	.db 0x00		;Step, contador de waypoints
+                             11 	.dw 0x0000		;puntero al array de waypoints
                              12 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
                              13 .endm
                              14 
@@ -54,26 +54,31 @@ Hexadecimal [16-Bits]
                      0007    30 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
                      0008    31 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
                      0009    32 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     000A    33 e_ai_st = 10
-                     000B    34 e_ai_pre_st = 11
-                     000C    35 e_ai_patrol_step = 12
-                     000D    36 e_lastVP_l = 13	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     000E    37 e_lastVP_h = 14	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
-                     000F    38 sizeof_e = 15	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
-                             39 	
-                             40 ;;Creamos una enumeración de status de ia
-                             41 
-                     0000    42 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
-                     0001    43 e_ai_st_stand_by = 1	;stand by
-                     0002    44 e_ai_st_move_to = 2
-                     0003    45 e_ai_st_patrol = 3
-                             46 
+                     000A    33 e_ai_st = 10	;status de la ia
+                     000B    34 e_ai_pre_st = 11	;status previo de la ia para volver al estado anterior si es necesario
+                     000C    35 e_ai_patrol_step_l = 12	;parte baja del puntero del array de waypoints
+                     000D    36 e_ai_patrol_step_h = 13	;parte alta del puntero del array de waypoints
+                     000E    37 e_lastVP_l = 14	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     000F    38 e_lastVP_h = 15	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
+                     0010    39 sizeof_e = 16	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
+                             40 	
+                             41 ;;Creamos una enumeración de status de ia
+                             42 
+                     0000    43 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
+                     0001    44 e_ai_st_stand_by = 1	;stand by
+                     0002    45 e_ai_st_move_to = 2
+                     0003    46 e_ai_st_patrol = 3
+                             47 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 4.
 Hexadecimal [16-Bits]
 
 
 
-                              6 ;.include "cmp/array_structure.h.s"
+                              6 .include "man/patrol.h.s"
+                              1 .globl patrol_invalid_move_x 
+                              2 
+                              3 .globl man_patrol_init
+                              4 .globl man_patrol_get
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 5.
 Hexadecimal [16-Bits]
 
@@ -132,58 +137,59 @@ Hexadecimal [16-Bits]
    0008 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
    000A 00                    6 	.db e_ai_st_noAI	;AI status
    000B 00                    7 	.db e_ai_st_noAI	;Previous AI status
-   000C 00                    8 	.db 0x00		;Step, contador de waypoints
-   000D CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   000F                      15 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
-   000F 46 28                 1 	.db 70, 40		;posición
-   0011 FF FE                 2 	.db 0xFF, 0xFE	;velocidad
-   0013 02 08                 3 	.db 2, 8		;tamaño
-   0015 00 00                 4 	.dw _sp_redball		;puntero a sprite
-   0017 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   0019 01                    6 	.db e_ai_st_stand_by	;AI status
-   001A 01                    7 	.db e_ai_st_stand_by	;Previous AI status
-   001B 00                    8 	.db 0x00		;Step, contador de waypoints
-   001C CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   001E                      16 sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
-   001E 28 78                 1 	.db 40, 120		;posición
-   0020 02 FC                 2 	.db 2, 0xFC	;velocidad
-   0022 03 04                 3 	.db 3, 4		;tamaño
-   0024 00 00                 4 	.dw _sp_sword		;puntero a sprite
-   0026 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
-   0028 00                    6 	.db e_ai_st_noAI	;AI status
-   0029 00                    7 	.db e_ai_st_noAI	;Previous AI status
-   002A 00                    8 	.db 0x00		;Step, contador de waypoints
-   002B CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
-   002D                      17 man_game_init::
-   002D CD 00 00      [17]   18 	call man_entity_init	;resetea el número de entidades a cero
-                             19 
-   0030 CD 00 00      [17]   20 	call man_entity_getArray		;en todos los init se utiliza código automodificable para cargar el puntero de la posición del inicio del array de entidades
-   0033 CD 00 00      [17]   21 	call sys_ai_control_init	;|utilizamos getArray porque utilizamos el init para meter el puntero al array en ix en el update mediante CODAUTMOD
-   0036 CD 00 00      [17]   22 	call sys_input_init
-   0039 CD 00 00      [17]   23 	call sys_physics_init
-   003C CD 00 00      [17]   24 	call sys_eren_init
-                             25 
+   000C 00 00                 8 	.dw 0x0000		;puntero al array de waypoints
+   000E CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   0010                      15 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
+   0010 46 28                 1 	.db 70, 40		;posición
+   0012 FF FE                 2 	.db 0xFF, 0xFE	;velocidad
+   0014 02 08                 3 	.db 2, 8		;tamaño
+   0016 00 00                 4 	.dw _sp_redball		;puntero a sprite
+   0018 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
+   001A 01                    6 	.db e_ai_st_stand_by	;AI status
+   001B 01                    7 	.db e_ai_st_stand_by	;Previous AI status
+   001C 00 00                 8 	.dw 0x0000		;puntero al array de waypoints
+   001E CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   0020                      16 sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
+   0020 28 78                 1 	.db 40, 120		;posición
+   0022 02 FC                 2 	.db 2, 0xFC	;velocidad
+   0024 03 04                 3 	.db 3, 4		;tamaño
+   0026 00 00                 4 	.dw _sp_sword		;puntero a sprite
+   0028 00 00                 5 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
+   002A 00                    6 	.db e_ai_st_noAI	;AI status
+   002B 00                    7 	.db e_ai_st_noAI	;Previous AI status
+   002C 00 00                 8 	.dw 0x0000		;puntero al array de waypoints
+   002E CC CC                 9 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
+   0030                      17 man_game_init::
+   0030 CD 00 00      [17]   18 	call man_patrol_init
+   0033 CD 00 00      [17]   19 	call man_entity_init	;resetea el número de entidades a cero
+                             20 
+   0036 CD 00 00      [17]   21 	call man_entity_getArray		;en todos los init se utiliza código automodificable para cargar el puntero de la posición del inicio del array de entidades
+   0039 CD 00 00      [17]   22 	call sys_ai_control_init	;|utilizamos getArray porque utilizamos el init para meter el puntero al array en ix en el update mediante CODAUTMOD
+   003C CD 00 00      [17]   23 	call sys_input_init
+   003F CD 00 00      [17]   24 	call sys_physics_init
+   0042 CD 00 00      [17]   25 	call sys_eren_init
                              26 
-   003F 21 00 00      [10]   27 	ld hl, #player
-   0042 CD 00 00      [17]   28 	call man_entity_create	;copia los valores a los que apunta hl en el primer sitio libre para crear una nueva entidad
-   0045 21 0F 00      [10]   29 	ld hl, #redball
-   0048 CD 00 00      [17]   30 	call man_entity_create
-   004B 21 1E 00      [10]   31 	ld hl, #sword
-   004E CD 00 00      [17]   32 	call man_entity_create
-   0051 C9            [10]   33 ret
-                             34 
-   0052                      35 man_game_update::
-   0052 CD 00 00      [17]   36 	call sys_input_update
-   0055 CD 00 00      [17]   37 	call sys_ai_control_update
-   0058 CD 00 00      [17]   38 	call sys_pysics_update
-   005B C9            [10]   39 ret
+                             27 
+   0045 21 00 00      [10]   28 	ld hl, #player
+   0048 CD 00 00      [17]   29 	call man_entity_create	;copia los valores a los que apunta hl en el primer sitio libre para crear una nueva entidad
+   004B 21 10 00      [10]   30 	ld hl, #redball
+   004E CD 00 00      [17]   31 	call man_entity_create
+   0051 21 20 00      [10]   32 	ld hl, #sword
+   0054 CD 00 00      [17]   33 	call man_entity_create
+   0057 C9            [10]   34 ret
+                             35 
+   0058                      36 man_game_update::
+   0058 CD 00 00      [17]   37 	call sys_input_update
+   005B CD 00 00      [17]   38 	call sys_ai_control_update
+   005E CD 00 00      [17]   39 	call sys_pysics_update
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 11.
 Hexadecimal [16-Bits]
 
 
 
-                             40 
-   005C                      41 man_game_render::
-   005C CD 00 00      [17]   42 	call sys_eren_update
-   005F C9            [10]   43 ret
-                             44 
+   0061 C9            [10]   40 ret
+                             41 
+   0062                      42 man_game_render::
+   0062 CD 00 00      [17]   43 	call sys_eren_update
+   0065 C9            [10]   44 ret
+                             45 

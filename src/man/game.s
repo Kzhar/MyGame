@@ -3,7 +3,7 @@
 
 .include "man/entity.h.s"
 .include "cmp/entity.h.s"
-;.include "cmp/array_structure.h.s"
+.include "man/patrol.h.s"
 .include "sys/render.h.s"
 .include "assets/assets.h.s"
 .include "sys/input.h.s"
@@ -15,6 +15,7 @@ player: 	DefineCmp_Entity 0, 0, 1, 2, 4, 16, _sp_mainchar, e_ai_st_noAI
 redball: 	DefineCmp_Entity 70, 40, 0xFF, 0xFE, 2, 8, _sp_redball, e_ai_st_stand_by
 sword:	DefineCmp_Entity 40, 120, 2, 0xFC, 3, 4, _sp_sword, e_ai_st_noAI
 man_game_init::
+	call man_patrol_init
 	call man_entity_init	;resetea el número de entidades a cero
 
 	call man_entity_getArray		;en todos los init se utiliza código automodificable para cargar el puntero de la posición del inicio del array de entidades

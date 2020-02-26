@@ -19,21 +19,21 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000000  s__CABS                         
      00000000  s__DABS                         
      00000005  max_entities                       cpct_keyboard
-     00000542  l__CODE                         
+     0000055B  l__CODE                         
      00004000  s__CODE                         
-     00004542  s__DATA                         
-     00004542  s__GSFINAL                      
-     00004542  s__GSINIT                       
-     00004542  s__HOME                         
-     00004542  s__INITIALIZED                  
-     00004542  s__INITIALIZER                  
-
+     0000455B  s__DATA                         
+     0000455B  s__GSFINAL                      
+     0000455B  s__GSINIT                       
+     0000455B  s__HOME                         
+     0000455B  s__INITIALIZED                  
+     0000455B  s__INITIALIZER                  
+     0000FFFF  patrol_invalid_move_x              
 ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00004000    00000542 =        1346. bytes (REL,CON)
+_CODE                               00004000    0000055B =        1371. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -42,41 +42,44 @@ _CODE                               00004000    00000542 =        1346. bytes (R
      0000401C  _pal_main                          player01
      0000402C  _sp_mainchar                       player01
      0000406C  _main                              cpct_keyboard
-     000040D0  man_entity_getArray                cpct_keyboard
-     000040D5  man_entity_init                    cpct_keyboard
-     000040E0  man_entity_create                  cpct_keyboard
-     000040EC  man_entity_new                     cpct_keyboard
-     00004130  man_game_init                      
-     00004155  man_game_update                    
-     0000415F  man_game_render                    
-     00004163  sys_ai_control_init                sys_ai_control
-     000041C7  sys_ai_control_update              sys_ai_control
-     000041ED  sys_ai_patrol                      sys_ai_control
-     00004222  sys_input_init                     cpct_keyboard
-     00004227  sys_input_update                   cpct_keyboard
-     00004277  sys_physics_init                   
-     0000427C  sys_pysics_update                  
-     000042C4  sys_eren_init                      cpct_keyboard
-     000042DD  sys_eren_update                    cpct_keyboard
-     000042E1  sys_eren_render_entities           cpct_keyboard
-     0000431F  cpct_setPalette_asm                cpct_video
-     00004332  _cpct_scanKeyboard_f               cpct_keyboard
-     00004332  cpct_scanKeyboard_f_asm            cpct_keyboard
-     0000439C  _cpct_isKeyPressed                 cpct_keyboard
-     0000439C  cpct_isKeyPressed_asm              cpct_keyboard
-     000043A8  cpct_setPALColour_asm              cpct_video
-     000043B2  cpct_drawSprite_asm                cpct_sprites
-     00004452  _cpct_keyboardStatusBuffer         cpct_keyboard
-     0000445C  cpct_setVideoMode_asm              cpct_video
-     00004469  _cpct_waitVSYNC                    cpct_video
-     00004469  cpct_waitVSYNC_asm                 cpct_video
-     00004471  _cpct_disableFirmware              cpct_firmware
-     00004471  _cpct_removeInterruptHandler       cpct_firmware
-     00004471  cpct_disableFirmware_asm           cpct_firmware
-     00004471  cpct_removeInterruptHandler_asm    cpct_firmware
-     00004481  cpct_drawSolidBox_asm              cpct_sprites
-     00004525  _cpct_mode_rom_status              cpct_firmware
-     00004526  cpct_getScreenPtr_asm              cpct_video
+     000040D5  man_entity_getArray                cpct_keyboard
+     000040DA  man_entity_init                    cpct_keyboard
+     000040E5  man_entity_create                  cpct_keyboard
+     000040F1  man_entity_new                     cpct_keyboard
+     00004138  man_game_init                      
+     00004160  man_game_update                    
+     0000416A  man_game_render                    
+     0000416E  man_patrol_init                    
+     0000416F  man_patrol_get                     
+     00004173  patrol_01                          
+     0000417E  sys_ai_control_init                sys_ai_control
+     000041E7  sys_ai_control_update              sys_ai_control
+     0000420D  sys_ai_patrol                      sys_ai_control
+     0000423B  sys_input_init                     cpct_keyboard
+     00004240  sys_input_update                   cpct_keyboard
+     00004290  sys_physics_init                   
+     00004295  sys_pysics_update                  
+     000042DD  sys_eren_init                      cpct_keyboard
+     000042F6  sys_eren_update                    cpct_keyboard
+     000042FA  sys_eren_render_entities           cpct_keyboard
+     00004338  cpct_setPalette_asm                cpct_video
+     0000434B  _cpct_scanKeyboard_f               cpct_keyboard
+     0000434B  cpct_scanKeyboard_f_asm            cpct_keyboard
+     000043B5  _cpct_isKeyPressed                 cpct_keyboard
+     000043B5  cpct_isKeyPressed_asm              cpct_keyboard
+     000043C1  cpct_setPALColour_asm              cpct_video
+     000043CB  cpct_drawSprite_asm                cpct_sprites
+     0000446B  _cpct_keyboardStatusBuffer         cpct_keyboard
+     00004475  cpct_setVideoMode_asm              cpct_video
+     00004482  _cpct_waitVSYNC                    cpct_video
+     00004482  cpct_waitVSYNC_asm                 cpct_video
+     0000448A  _cpct_disableFirmware              cpct_firmware
+     0000448A  _cpct_removeInterruptHandler       cpct_firmware
+     0000448A  cpct_disableFirmware_asm           cpct_firmware
+     0000448A  cpct_removeInterruptHandler_asm    cpct_firmware
+     0000449A  cpct_drawSolidBox_asm              cpct_sprites
+     0000453E  _cpct_mode_rom_status              cpct_firmware
+     0000453F  cpct_getScreenPtr_asm              cpct_video
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
 
@@ -92,6 +95,8 @@ obj/man/entity.h.rel                      [  ]
 obj/man/entity.rel                        [ cpct_keyboard ]
 obj/man/game.h.rel                        [  ]
 obj/man/game.rel                          [  ]
+obj/man/patrol.h.rel                      [  ]
+obj/man/patrol.rel                        [  ]
 obj/cmp/array_structure.h.rel             [  ]
 obj/cmp/entity.h.rel                      [  ]
 obj/sys/ai_control.h.rel                  [  ]

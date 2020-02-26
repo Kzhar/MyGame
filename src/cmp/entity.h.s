@@ -8,7 +8,7 @@
 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
 	.db _AIstatus	;AI status
 	.db _AIstatus	;Previous AI status
-	.db 0x00		;Step, contador de waypoints
+	.dw 0x0000		;puntero al array de waypoints
 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
 .endm
 
@@ -30,12 +30,13 @@ e_pspr_l = 6	;byte bajo de la dirección de memoria del sprite
 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
-e_ai_st = 10
-e_ai_pre_st = 11
-e_ai_patrol_step = 12
-e_lastVP_l = 13	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-e_lastVP_h = 14	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
-sizeof_e = 15	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
+e_ai_st = 10	;status de la ia
+e_ai_pre_st = 11	;status previo de la ia para volver al estado anterior si es necesario
+e_ai_patrol_step_l = 12	;parte baja del puntero del array de waypoints
+e_ai_patrol_step_h = 13	;parte alta del puntero del array de waypoints
+e_lastVP_l = 14	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+e_lastVP_h = 15	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
+sizeof_e = 16	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
 	
 ;;Creamos una enumeración de status de ia
 

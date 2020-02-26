@@ -17,6 +17,8 @@ obj/man/entity.h.rel
 obj/man/entity.rel
 obj/man/game.h.rel
 obj/man/game.rel
+obj/man/patrol.h.rel
+obj/man/patrol.rel
 obj/cmp/array_structure.h.rel
 obj/cmp/entity.h.rel
 obj/sys/ai_control.h.rel

@@ -2539,7 +2539,7 @@ Hexadecimal [16-Bits]
                               8 	.db 0x00, 0x00	;e_ai_aim_x y e_ai_aim_y posición objetivo a la que moverse
                               9 	.db _AIstatus	;AI status
                              10 	.db _AIstatus	;Previous AI status
-                             11 	.db 0x00		;Step, contador de waypoints
+                             11 	.dw 0x0000		;puntero al array de waypoints
                              12 	.dw #0xCCCC		;últia posición del sprite en memoria de video (para utilizarla para el borrado del sprite)
                              13 .endm
                              14 
@@ -2561,20 +2561,21 @@ Hexadecimal [16-Bits]
                      0007    30 e_pspr_h = 7	;byte alto de la dirección de memoria del sprite (primero el bajo porque es little endian)	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
                      0008    31 e_ai_aim_X = 8	;posición objetivo de las entidades que tienen ia y su status es moverse
                      0009    32 e_ai_aim_y = 9	;posición objetivo de las entidades que tienen ia y su status es moverse
-                     000A    33 e_ai_st = 10
-                     000B    34 e_ai_pre_st = 11
-                     000C    35 e_ai_patrol_step = 12
-                     000D    36 e_lastVP_l = 13	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
-                     000E    37 e_lastVP_h = 14	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
-                     000F    38 sizeof_e = 15	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
-                             39 	
-                             40 ;;Creamos una enumeración de status de ia
-                             41 
-                     0000    42 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
-                     0001    43 e_ai_st_stand_by = 1	;stand by
-                     0002    44 e_ai_st_move_to = 2
-                     0003    45 e_ai_st_patrol = 3
-                             46 
+                     000A    33 e_ai_st = 10	;status de la ia
+                     000B    34 e_ai_pre_st = 11	;status previo de la ia para volver al estado anterior si es necesario
+                     000C    35 e_ai_patrol_step_l = 12	;parte baja del puntero del array de waypoints
+                     000D    36 e_ai_patrol_step_h = 13	;parte alta del puntero del array de waypoints
+                     000E    37 e_lastVP_l = 14	;byte bajo de la posición de memoria de video antes de mover el sprite para su borrado
+                     000F    38 e_lastVP_h = 15	;en este byte se guarda en status de la ia (desde 0=no tiene ia hasta moverse o permanecer parado)
+                     0010    39 sizeof_e = 16	;tamaño de los datos de la entidad en bytes (para calcular el punto al que mover el puntero para pasar de una entidad a otra)
+                             40 	
+                             41 ;;Creamos una enumeración de status de ia
+                             42 
+                     0000    43 e_ai_st_noAI = 0		;status no IA, el que cargará la definición del componente por defercto
+                     0001    44 e_ai_st_stand_by = 1	;stand by
+                     0002    45 e_ai_st_move_to = 2
+                     0003    46 e_ai_st_patrol = 3
+                             47 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 52.
 Hexadecimal [16-Bits]
 
@@ -2582,71 +2583,71 @@ Hexadecimal [16-Bits]
 
                               5 
                               6 ;INPUT IX = POINTER TO ENTITY[0]
-   4222                       7 sys_input_init::
-   4222 DD 22 29 42   [20]    8 	ld (_ent_array_ptr), ix
-   4226 C9            [10]    9 ret
+   423B                       7 sys_input_init::
+   423B DD 22 42 42   [20]    8 	ld (_ent_array_ptr), ix
+   423F C9            [10]    9 ret
                              10 
                              11 ;UPDATE La actualización del sistema de input lo que hace es actualizar excusivamente
                              12 ;la entidad "0" que es el player por defecto
                              13 ;INPUT IX = POINTER TO ENTITY[0]
                              14 
-   4227                      15 sys_input_update::
+   4240                      15 sys_input_update::
                      0007    16 	_ent_array_ptr = .+2		;ld ix es una instrucción del juego extendido, por ellos la posición de 0x0000 será .+2
-   4227 DD 21 00 00   [14]   17 	ld ix, #0x0000			;codigo automodificable desde el init
+   4240 DD 21 00 00   [14]   17 	ld ix, #0x0000			;codigo automodificable desde el init
                              18 
-   422B DD 36 02 00   [19]   19 	ld e_vx(ix), #0
-   422F DD 36 03 00   [19]   20 	ld e_vy(ix), #0	;ponemos velocidad y,x de la entidad a cero
+   4244 DD 36 02 00   [19]   19 	ld e_vx(ix), #0
+   4248 DD 36 03 00   [19]   20 	ld e_vy(ix), #0	;ponemos velocidad y,x de la entidad a cero
                              21 
-   4233 CD 32 43      [17]   22 	call cpct_scanKeyboard_f_asm
+   424C CD 4B 43      [17]   22 	call cpct_scanKeyboard_f_asm
                              23 
-   4236 21 04 04      [10]   24 	ld hl, #Key_O			;A 16-bit value containing a Matrix-Line(1B, L) and a BitMask(1B, H).
-   4239 CD 9C 43      [17]   25 	call cpct_isKeyPressed_asm	
-   423C 28 04         [12]   26 	jr z, O_NotPressed
+   424F 21 04 04      [10]   24 	ld hl, #Key_O			;A 16-bit value containing a Matrix-Line(1B, L) and a BitMask(1B, H).
+   4252 CD B5 43      [17]   25 	call cpct_isKeyPressed_asm	
+   4255 28 04         [12]   26 	jr z, O_NotPressed
                              27 
-   423E                      28 	O_pressed:
-   423E DD 36 02 FF   [19]   29 		ld e_vx(ix), #-1
+   4257                      28 	O_pressed:
+   4257 DD 36 02 FF   [19]   29 		ld e_vx(ix), #-1
                              30 
-   4242                      31 	O_NotPressed:
+   425B                      31 	O_NotPressed:
                              32 
-   4242 21 03 08      [10]   33 	ld hl, #Key_P
-   4245 CD 9C 43      [17]   34 	call cpct_isKeyPressed_asm	
-   4248 28 04         [12]   35 	jr z, P_NotPressed
+   425B 21 03 08      [10]   33 	ld hl, #Key_P
+   425E CD B5 43      [17]   34 	call cpct_isKeyPressed_asm	
+   4261 28 04         [12]   35 	jr z, P_NotPressed
                              36 
-   424A                      37 	P_pressed:
-   424A DD 36 02 01   [19]   38 		ld e_vx(ix), #1
+   4263                      37 	P_pressed:
+   4263 DD 36 02 01   [19]   38 		ld e_vx(ix), #1
                              39 
-   424E                      40 	P_NotPressed:
+   4267                      40 	P_NotPressed:
                              41 
-   424E 21 08 08      [10]   42 	ld hl, #Key_Q
-   4251 CD 9C 43      [17]   43 	call cpct_isKeyPressed_asm	
-   4254 28 04         [12]   44 	jr z, Q_NotPressed
+   4267 21 08 08      [10]   42 	ld hl, #Key_Q
+   426A CD B5 43      [17]   43 	call cpct_isKeyPressed_asm	
+   426D 28 04         [12]   44 	jr z, Q_NotPressed
                              45 
-   4256                      46 	Q_pressed:
-   4256 DD 36 03 FE   [19]   47 		ld e_vy(ix), #-2
+   426F                      46 	Q_pressed:
+   426F DD 36 03 FE   [19]   47 		ld e_vy(ix), #-2
                              48 
-   425A                      49 	Q_NotPressed:
+   4273                      49 	Q_NotPressed:
                              50 
-   425A 21 08 20      [10]   51 	ld hl, #Key_A
-   425D CD 9C 43      [17]   52 	call cpct_isKeyPressed_asm	
-   4260 28 04         [12]   53 	jr z, A_NotPressed
+   4273 21 08 20      [10]   51 	ld hl, #Key_A
+   4276 CD B5 43      [17]   52 	call cpct_isKeyPressed_asm	
+   4279 28 04         [12]   53 	jr z, A_NotPressed
                              54 
-   4262                      55 	A_pressed:
-   4262 DD 36 03 02   [19]   56 		ld e_vy(ix), #2
+   427B                      55 	A_pressed:
+   427B DD 36 03 02   [19]   56 		ld e_vy(ix), #2
                              57 
-   4266                      58 	A_NotPressed:
+   427F                      58 	A_NotPressed:
                              59 		;PLACEHOLDER SI PRESIONAMOS UNA TECLA CAMBIAMOS EL COMPORTAMIENTO DEL SISTEMA DE IA DE LAS ENTIDADES CON IA
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 53.
 Hexadecimal [16-Bits]
 
 
 
-   4266 DD 36 08 00   [19]   60 		ld e_ai_aim_X(ix), #0	;reiniciamos esta variable a 0 que será la que comprovaremos
+   427F DD 36 08 00   [19]   60 		ld e_ai_aim_X(ix), #0	;reiniciamos esta variable a 0 que será la que comprovaremos
                              61 
-   426A 21 05 80      [10]   62 	ld hl, #Key_Space
-   426D CD 9C 43      [17]   63 	call cpct_isKeyPressed_asm	
-   4270 28 04         [12]   64 	jr z, spc_NotPressed
-   4272                      65 	spc_pressed:
-   4272 DD 36 08 01   [19]   66 		ld e_ai_aim_X(ix), #1	;cambiamos temporalmente el valor de esta variable para que la compruebe el sistema de IA 
+   4283 21 05 80      [10]   62 	ld hl, #Key_Space
+   4286 CD B5 43      [17]   63 	call cpct_isKeyPressed_asm	
+   4289 28 04         [12]   64 	jr z, spc_NotPressed
+   428B                      65 	spc_pressed:
+   428B DD 36 08 01   [19]   66 		ld e_ai_aim_X(ix), #1	;cambiamos temporalmente el valor de esta variable para que la compruebe el sistema de IA 
                              67 
-   4276                      68 	spc_NotPressed:
-   4276 C9            [10]   69 ret
+   428F                      68 	spc_NotPressed:
+   428F C9            [10]   69 ret

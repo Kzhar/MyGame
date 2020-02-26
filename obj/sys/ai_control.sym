@@ -4,25 +4,26 @@ Hexadecimal [16-Bits]
 Symbol Table
 
     .__.$$$.=  2710 L   |     .__.ABS.=  0000 G   |     .__.CPU.=  0000 L
-    .__.H$L.=  0000 L   |   0 _AIent     0074 R   |   0 _arrived   0035 R
-  0 _arrived   004F R   |   0 _endif_x   0039 R   |   0 _endif_y   0063 R
-  0 _ent_arr=  000B R   |   0 _ent_arr=  0066 R   |   0 _loop      0068 R
-  0 _no_AI_e   0083 R   |   0 _objx_gr   002D R   |   0 _objx_le   0027 R
-  0 _objy_gr   0047 R   |   0 _objy_le   0041 R   |   0 _step0     0095 R
-  0 _step1     00AA R   |     e_ai_aim=  0008     |     e_ai_aim=  0009 
+    .__.H$L.=  0000 L   |   0 _AIent     0079 R   |   0 _arrived   003A R
+  0 _arrived   0054 R   |   0 _endif_x   003E R   |   0 _endif_y   0068 R
+  0 _ent_arr=  000B R   |   0 _ent_arr=  006B R   |   0 _loop      006D R
+  0 _no_AI_e   0088 R   |   0 _objx_gr   0032 R   |   0 _objx_le   002C R
+  0 _objy_gr   004C R   |   0 _objy_le   0046 R   |   0 _reset_p   00B2 R
+    e_ai_aim=  0008     |     e_ai_aim=  0009     |     e_ai_pat=  000D 
     e_ai_pat=  000C     |     e_ai_pre=  000B     |     e_ai_st =  000A 
     e_ai_st_=  0002     |     e_ai_st_=  0000     |     e_ai_st_=  0003 
-    e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000E 
-    e_lastVP=  000D     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
+    e_ai_st_=  0001     |     e_h     =  0005     |     e_lastVP=  000F 
+    e_lastVP=  000E     |     e_pspr_h=  0007     |     e_pspr_l=  0006 
     e_vx    =  0002     |     e_vy    =  0003     |     e_w     =  0004 
-    e_x     =  0000     |     e_y     =  0001     |     sizeof_e=  000F 
-  0 sys_ai_c   0000 GR  |   0 sys_ai_c   0064 GR  |   0 sys_ai_m   001F R
-  0 sys_ai_p   008A GR  |   0 sys_ai_s   0009 R
+    e_x     =  0000     |     e_y     =  0001     |     man_patr   **** GX
+    man_patr   **** GX  |     patrol_i   **** GX  |     sizeof_e=  0010 
+  0 sys_ai_c   0000 GR  |   0 sys_ai_c   0069 GR  |   0 sys_ai_m   0024 R
+  0 sys_ai_p   008F GR  |   0 sys_ai_s   0009 R
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE      size   BF   flags    0
+   0 _CODE      size   BD   flags    0
 

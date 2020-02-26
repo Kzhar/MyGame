@@ -1,4 +1,5 @@
 .include "cmp/entity.h.s"
+.include "man/patrol.h.s"
 
 .module sys_ai_control
 
@@ -20,7 +21,9 @@ sys_ai_stand_by:
 			;ld e_ai_aim_X(ix), a			;cargamos en la variable de la posición objetivo de la entidad
 			;ld a, e_y(iy)				;|
 			;ld e_ai_aim_y(ix), a			;|lo mismo para la posición y del player en la posición y objetivo de la entidad
-			ld e_ai_patrol_step(ix), #0
+			call man_patrol_get			;en HL el puntero al primer elemento del array de waypoints de patrulla
+			ld e_ai_patrol_step_l(ix), l		;|
+			ld e_ai_patrol_step_h(ix), h		;|cargado en las variables de la entidad el puntero al array de waypoints
 			ld e_ai_pre_st(ix), #e_ai_st_stand_by
 			ld e_ai_st(ix), #e_ai_st_patrol	;nuevo estado de la entidad, move_to
 ret
@@ -102,25 +105,31 @@ sys_ai_control_update::
 			jr _loop
 
 sys_ai_patrol::
-	ld a, e_ai_patrol_step(ix)
-	cp #0
-	jr z, _step0
-	cp #1
-	jr z, _step1
+	ld l, e_ai_patrol_step_l(ix)		;	
+	ld h, e_ai_patrol_step_h(ix)		;cargamos en hl el puntero al waypoint actual
+	ld a, (hl)					;a = posición x del waypoint
+	cp #patrol_invalid_move_x		;si es -1 volvemos al primer punto del waypoint (guardado en las siguientes posiciones de memoria)
+	jr z, _reset_patrol 
 
-	_step0:
-	ld e_ai_aim_X(ix), #6
-	ld e_ai_aim_y(ix), #6
-	ld e_ai_pre_st(ix), #e_ai_st_patrol
-	ld e_ai_st(ix), #e_ai_st_move_to
-	ld e_ai_patrol_step(ix), #1
-	ret
+	ld e_ai_aim_X(ix), a			;metemos en las variables de la entidad las posiciones objetivo x e y del waypoint al que tiene que ir
+	inc hl
+	ld a, (hl)
+	ld e_ai_aim_y(ix), a
 
-	_step1:
-	ld e_ai_aim_X(ix), #32
-	ld e_ai_aim_y(ix), #40
-	ld e_ai_pre_st(ix), #e_ai_st_patrol
-	ld e_ai_st(ix), #e_ai_st_move_to
-	ld e_ai_patrol_step(ix), #0
-	ret
+	inc hl					;|
+	ld e_ai_patrol_step_l(ix), l		;|
+	ld e_ai_patrol_step_h(ix), h		;|una vez guardada la posición objetivo podemos guardar en la unidad el waypoint siguiente
 
+	ld e_ai_pre_st(ix), #e_ai_st_patrol	;estado actual pasa a estado previo
+	ld e_ai_st(ix), #e_ai_st_move_to	;nuevo estado => move to para la siguiente iretación
+ret
+
+_reset_patrol:
+	inc hl 	;donde está guardada la posición de memoria del inicio del array
+	ld a, (hl)	;parte baja de la posición de memoria del inicio del array
+	inc hl
+	ld h, (hl)	;parte alta de la posición de memoria del inicio del array
+	ld e_ai_patrol_step_l(ix), a		;|	
+	ld e_ai_patrol_step_h(ix), h		;|puntero al comienzo del array de waypoitns
+
+ret
